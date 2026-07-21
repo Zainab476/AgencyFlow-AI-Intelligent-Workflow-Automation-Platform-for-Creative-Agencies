@@ -9,6 +9,8 @@ import tasksRouter from "./tasks";
 import notificationsRouter from "./notifications";
 import activityRouter from "./activity";
 import uploadsRouter from "./uploads";
+import aiRouter from "./ai";
+import documentsRouter from "./documents";
 
 const router = Router();
 
@@ -22,5 +24,7 @@ router.use("/tasks", tasksRouter);
 router.use("/notifications", notificationsRouter);
 router.use("/activity", activityRouter);
 router.use("/uploads", uploadsRouter);
+router.use("/ai", aiRouter);
+router.use("/documents", documentsRouter);
 
 export default router;

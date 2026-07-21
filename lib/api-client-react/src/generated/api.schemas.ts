@@ -290,6 +290,80 @@ export interface DashboardStats {
   projectsByStatus: ProjectStatusCount[];
 }
 
+export type MissingFieldImportance = typeof MissingFieldImportance[keyof typeof MissingFieldImportance];
+
+
+export const MissingFieldImportance = {
+  critical: 'critical',
+  recommended: 'recommended',
+  optional: 'optional',
+} as const;
+
+export interface MissingField {
+  field: string;
+  label: string;
+  importance: MissingFieldImportance;
+  suggestion?: string;
+}
+
+export interface ProjectAnalysis {
+  missingFields: MissingField[];
+  executiveSummary: string;
+  campaignGoals: string[];
+  targetAudience: string;
+  deliverables: string[];
+  recommendations: string[];
+  riskFactors: string[];
+}
+
+export type ChatMessageInputRole = typeof ChatMessageInputRole[keyof typeof ChatMessageInputRole];
+
+
+export const ChatMessageInputRole = {
+  user: 'user',
+  assistant: 'assistant',
+} as const;
+
+export interface ChatMessageInput {
+  role: ChatMessageInputRole;
+  content: string;
+}
+
+export interface ChatRequest {
+  projectId: number;
+  messages: ChatMessageInput[];
+}
+
+export type DocumentType = typeof DocumentType[keyof typeof DocumentType];
+
+
+export const DocumentType = {
+  proposal: 'proposal',
+  contract: 'contract',
+  presentation: 'presentation',
+  invoice: 'invoice',
+} as const;
+
+export type GeneratedDocumentContent = { [key: string]: unknown };
+
+export interface GeneratedDocument {
+  id: number;
+  projectId: number;
+  /** @nullable */
+  projectName?: string | null;
+  /** @nullable */
+  clientName?: string | null;
+  type: DocumentType;
+  title: string;
+  content: GeneratedDocumentContent;
+  createdAt: string;
+}
+
+export interface GenerateDocumentRequest {
+  projectId: number;
+  type: DocumentType;
+}
+
 export type ListClientsParams = {
 /**
  * Search by company name or contact person
@@ -372,5 +446,13 @@ taskId?: number;
 
 export type GetRecentProjectsParams = {
 limit?: number;
+};
+
+export type ListDocumentsParams = {
+projectId?: number;
+};
+
+export type DeleteDocument200 = {
+  success: boolean;
 };
 

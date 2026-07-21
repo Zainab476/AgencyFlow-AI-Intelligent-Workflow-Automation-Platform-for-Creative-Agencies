@@ -23,7 +23,13 @@ import {
   FileText,
   Image as ImageIcon,
   File as FileIcon,
-  X
+  X,
+  Sparkles,
+  MessageSquare,
+  Download,
+  Presentation,
+  Receipt,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { 
   useGetProject,
@@ -38,6 +44,8 @@ import {
   useListActivity,
   useListUploads,
   useDeleteUpload,
+  useListDocuments,
+  getListDocumentsQueryKey,
   getGetProjectQueryKey,
   getListProjectMembersQueryKey,
   getListTasksQueryKey,
@@ -46,8 +54,12 @@ import {
   ProjectStatus,
   MemberRole,
   TaskStatus,
-  TaskPriority
+  TaskPriority,
+  type DocumentType,
 } from '@workspace/api-client-react';
+import AIChatPanel from '@/components/ai/AIChatPanel';
+import ProjectAnalysisCard from '@/components/ai/ProjectAnalysis';
+import GenerateDocumentDialog from '@/components/documents/GenerateDocumentDialog';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -150,6 +162,8 @@ export default function ProjectDetail({ id }: { id: string }) {
   // Modals state
   const [memberDialogOpen, setMemberDialogOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [docGenOpen, setDocGenOpen] = useState(false);
 
   const { data: project, isLoading: isProjectLoading } = useGetProject(projectId, {
     query: { enabled: !!projectId, queryKey: getGetProjectQueryKey(projectId) }
@@ -160,6 +174,7 @@ export default function ProjectDetail({ id }: { id: string }) {
   const { data: tasks } = useListTasks({ projectId }, { query: { enabled: !!projectId, queryKey: getListTasksQueryKey({ projectId }) } });
   const { data: uploads } = useListUploads({ projectId }, { query: { enabled: !!projectId, queryKey: getListUploadsQueryKey({ projectId }) } });
   const { data: activities } = useListActivity({ projectId }, { query: { enabled: !!projectId, queryKey: getListActivityQueryKey({ projectId }) } });
+  const { data: projectDocs } = useListDocuments({ projectId }, { query: { enabled: !!projectId, queryKey: getListDocumentsQueryKey({ projectId }) } });
 
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
@@ -413,12 +428,13 @@ export default function ProjectDetail({ id }: { id: string }) {
       </div>
 
       <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full max-w-2xl grid-cols-5 bg-muted/50 border border-border/50">
-          <TabsTrigger value="overview" className="gap-2"><Briefcase className="h-4 w-4" /> Overview</TabsTrigger>
-          <TabsTrigger value="team" className="gap-2"><Users className="h-4 w-4" /> Team</TabsTrigger>
-          <TabsTrigger value="tasks" className="gap-2"><CheckSquare className="h-4 w-4" /> Tasks</TabsTrigger>
-          <TabsTrigger value="files" className="gap-2"><Files className="h-4 w-4" /> Files</TabsTrigger>
-          <TabsTrigger value="activity" className="gap-2"><Activity className="h-4 w-4" /> Activity</TabsTrigger>
+        <TabsList className="grid w-full max-w-3xl grid-cols-6 bg-muted/50 border border-border/50">
+          <TabsTrigger value="overview" className="gap-1.5 text-xs"><Briefcase className="h-3.5 w-3.5" /> Overview</TabsTrigger>
+          <TabsTrigger value="team" className="gap-1.5 text-xs"><Users className="h-3.5 w-3.5" /> Team</TabsTrigger>
+          <TabsTrigger value="tasks" className="gap-1.5 text-xs"><CheckSquare className="h-3.5 w-3.5" /> Tasks</TabsTrigger>
+          <TabsTrigger value="files" className="gap-1.5 text-xs"><Files className="h-3.5 w-3.5" /> Files</TabsTrigger>
+          <TabsTrigger value="activity" className="gap-1.5 text-xs"><Activity className="h-3.5 w-3.5" /> Activity</TabsTrigger>
+          <TabsTrigger value="ai" className="gap-1.5 text-xs text-primary data-[state=active]:text-primary"><Sparkles className="h-3.5 w-3.5" /> AI</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-6 focus-visible:outline-none">
@@ -798,6 +814,100 @@ export default function ProjectDetail({ id }: { id: string }) {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* ── AI Tab ───────────────────────────────────────────────────────── */}
+        <TabsContent value="ai" className="mt-6 focus-visible:outline-none">
+          <div className="space-y-6">
+            {/* AI Action Buttons */}
+            <div className="flex flex-wrap gap-3">
+              <Button
+                onClick={() => setChatOpen(true)}
+                variant="outline"
+                className="gap-2 border-primary/30 text-primary hover:bg-primary/5"
+              >
+                <MessageSquare className="h-4 w-4" />
+                Chat with AI Assistant
+              </Button>
+              <Button
+                onClick={() => setDocGenOpen(true)}
+                className="gap-2"
+              >
+                <Sparkles className="h-4 w-4" />
+                Generate Document
+              </Button>
+            </div>
+
+            {/* Project Analysis */}
+            <ProjectAnalysisCard projectId={projectId} />
+
+            {/* Recent Documents */}
+            {(projectDocs ?? []).length > 0 && (
+              <div className="space-y-3">
+                <h3 className="font-semibold text-sm flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-primary" />
+                  Generated Documents ({projectDocs!.length})
+                </h3>
+                <div className="grid gap-2">
+                  {projectDocs!.map((doc) => {
+                    const iconMap: Record<string, React.ElementType> = {
+                      proposal: FileText,
+                      contract: FileSpreadsheet,
+                      presentation: Presentation,
+                      invoice: Receipt,
+                    };
+                    const colorMap: Record<string, string> = {
+                      proposal: 'text-violet-600 bg-violet-500/10 border-violet-500/20',
+                      contract: 'text-blue-600 bg-blue-500/10 border-blue-500/20',
+                      presentation: 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20',
+                      invoice: 'text-amber-600 bg-amber-500/10 border-amber-500/20',
+                    };
+                    const DocIcon = iconMap[doc.type] ?? FileText;
+                    const color = colorMap[doc.type] ?? '';
+                    return (
+                      <div key={doc.id} className="flex items-center gap-3 rounded-lg border border-border/50 bg-card px-4 py-3">
+                        <div className={cn('flex h-8 w-8 shrink-0 items-center justify-center rounded-md border', color)}>
+                          <DocIcon className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-sm truncate">{doc.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(doc.createdAt), 'MMM d, yyyy')}
+                          </p>
+                        </div>
+                        <div className="flex gap-1 shrink-0">
+                          {(['pdf', 'docx', 'pptx'] as const).map((fmt) => (
+                            <Button
+                              key={fmt}
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-xs text-muted-foreground hover:text-foreground"
+                              onClick={async () => {
+                                const token = localStorage.getItem('af_token');
+                                const res = await fetch(`/api/documents/${doc.id}/export/${fmt}`, {
+                                  headers: token ? { Authorization: `Bearer ${token}` } : {},
+                                });
+                                if (!res.ok) return;
+                                const blob = await res.blob();
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = `${doc.title.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.${fmt}`;
+                                a.click();
+                                URL.revokeObjectURL(url);
+                              }}
+                            >
+                              <Download className="h-3 w-3 mr-1" />{fmt.toUpperCase()}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </TabsContent>
       </Tabs>
 
       {/* Member Dialog */}
@@ -861,6 +971,21 @@ export default function ProjectDetail({ id }: { id: string }) {
           </Form>
         </DialogContent>
       </Dialog>
+      {/* AI Chat Panel */}
+      <AIChatPanel
+        projectId={projectId}
+        projectName={project?.campaignName ?? ''}
+        open={chatOpen}
+        onClose={() => setChatOpen(false)}
+      />
+
+      {/* Generate Document Dialog */}
+      <GenerateDocumentDialog
+        projectId={projectId}
+        projectName={project?.campaignName ?? ''}
+        open={docGenOpen}
+        onClose={() => setDocGenOpen(false)}
+      />
     </div>
   );
 }

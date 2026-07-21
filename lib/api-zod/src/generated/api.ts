@@ -691,3 +691,111 @@ export const GetRecentProjectsResponseItem = zod.object({
 export const GetRecentProjectsResponse = zod.array(GetRecentProjectsResponseItem)
 
 
+/**
+ * @summary Analyze a project with AI — detect missing fields and generate insights
+ */
+export const AnalyzeProjectParams = zod.object({
+  "projectId": zod.coerce.number()
+})
+
+export const AnalyzeProjectResponse = zod.object({
+  "missingFields": zod.array(zod.object({
+  "field": zod.string(),
+  "label": zod.string(),
+  "importance": zod.enum(['critical', 'recommended', 'optional']),
+  "suggestion": zod.string().optional()
+})),
+  "executiveSummary": zod.string(),
+  "campaignGoals": zod.array(zod.string()),
+  "targetAudience": zod.string(),
+  "deliverables": zod.array(zod.string()),
+  "recommendations": zod.array(zod.string()),
+  "riskFactors": zod.array(zod.string())
+})
+
+
+/**
+ * @summary Chat with AI about a project (SSE streaming)
+ */
+export const ChatWithAIBody = zod.object({
+  "projectId": zod.number(),
+  "messages": zod.array(zod.object({
+  "role": zod.enum(['user', 'assistant']),
+  "content": zod.string()
+}))
+})
+
+export const ChatWithAIResponse = zod.unknown()
+
+
+/**
+ * @summary List all generated documents for the current user
+ */
+export const ListDocumentsQueryParams = zod.object({
+  "projectId": zod.coerce.number().optional()
+})
+
+export const ListDocumentsResponseItem = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "projectName": zod.string().nullish(),
+  "clientName": zod.string().nullish(),
+  "type": zod.enum(['proposal', 'contract', 'presentation', 'invoice']),
+  "title": zod.string(),
+  "content": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.string()
+})
+export const ListDocumentsResponse = zod.array(ListDocumentsResponseItem)
+
+
+/**
+ * @summary Generate a document using AI and save it
+ */
+export const GenerateDocumentBody = zod.object({
+  "projectId": zod.number(),
+  "type": zod.enum(['proposal', 'contract', 'presentation', 'invoice'])
+})
+
+export const GenerateDocumentResponse = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "projectName": zod.string().nullish(),
+  "clientName": zod.string().nullish(),
+  "type": zod.enum(['proposal', 'contract', 'presentation', 'invoice']),
+  "title": zod.string(),
+  "content": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Get a single generated document
+ */
+export const GetDocumentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetDocumentResponse = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "projectName": zod.string().nullish(),
+  "clientName": zod.string().nullish(),
+  "type": zod.enum(['proposal', 'contract', 'presentation', 'invoice']),
+  "title": zod.string(),
+  "content": zod.record(zod.string(), zod.unknown()),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a generated document
+ */
+export const DeleteDocumentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteDocumentResponse = zod.object({
+  "success": zod.boolean()
+})
+
+

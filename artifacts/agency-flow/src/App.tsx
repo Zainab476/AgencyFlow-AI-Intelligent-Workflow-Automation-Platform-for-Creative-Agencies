@@ -16,6 +16,7 @@ import Profile from '@/pages/Profile';
 import Tasks from '@/pages/Tasks';
 import Notifications from '@/pages/Notifications';
 import ActivityLog from '@/pages/ActivityLog';
+import Documents from '@/pages/Documents';
 import NotFound from '@/pages/not-found';
 
 const queryClient = new QueryClient({
@@ -81,6 +82,9 @@ function Router() {
       </Route>
       <Route path="/activity">
         {() => <ProtectedRoute component={ActivityLog} path="/activity" />}
+      </Route>
+      <Route path="/documents">
+        {() => <ProtectedRoute component={Documents} path="/documents" />}
       </Route>
       
       <Route component={NotFound} />

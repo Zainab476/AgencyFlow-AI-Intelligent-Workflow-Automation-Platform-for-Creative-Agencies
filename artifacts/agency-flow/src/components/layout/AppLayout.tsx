@@ -9,7 +9,9 @@ import {
   Menu,
   CheckSquare,
   Bell,
-  Activity
+  Activity,
+  FileText,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGetMe, useListNotifications } from '@workspace/api-client-react';
@@ -38,6 +40,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     { name: 'Clients', href: '/clients', icon: Users },
     { name: 'Projects', href: '/projects', icon: FolderKanban },
     { name: 'Tasks', href: '/tasks', icon: CheckSquare },
+    { name: 'Documents', href: '/documents', icon: FileText },
     { name: 'Notifications', href: '/notifications', icon: Bell },
     { name: 'Activity', href: '/activity', icon: Activity },
   ];

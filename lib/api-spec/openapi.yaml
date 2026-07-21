@@ -28,6 +28,10 @@ tags:
     description: Activity log
   - name: uploads
     description: File uploads
+  - name: ai
+    description: AI project assistant
+  - name: documents
+    description: Document generation
 
 paths:
   /healthz:
@@ -1087,6 +1091,191 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  # ── AI endpoints ──────────────────────────────────────────────────────────────
+  /ai/analyze/{projectId}:
+    post:
+      operationId: analyzeProject
+      tags: [ai]
+      summary: Analyze a project with AI — detect missing fields and generate insights
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Project analysis
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectAnalysis"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Project not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /ai/chat:
+    post:
+      operationId: chatWithAI
+      tags: [ai]
+      summary: Chat with AI about a project (SSE streaming)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: Server-sent event stream of AI response chunks
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  # ── Document endpoints ─────────────────────────────────────────────────────
+  /documents:
+    get:
+      operationId: listDocuments
+      tags: [documents]
+      summary: List all generated documents for the current user
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: projectId
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GeneratedDocument"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /documents/generate:
+    post:
+      operationId: generateDocument
+      tags: [documents]
+      summary: Generate a document using AI and save it
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateDocumentRequest"
+      responses:
+        "201":
+          description: Document generated and saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneratedDocument"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /documents/{id}:
+    get:
+      operationId: getDocument
+      tags: [documents]
+      summary: Get a single generated document
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneratedDocument"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteDocument
+      tags: [documents]
+      summary: Delete a generated document
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1594,3 +1783,111 @@ components:
         - activeProjects
         - totalBudget
         - projectsByStatus
+
+    # ── AI schemas ────────────────────────────────────────────────────────────
+    MissingField:
+      type: object
+      properties:
+        field:
+          type: string
+        label:
+          type: string
+        importance:
+          type: string
+          enum: [critical, recommended, optional]
+        suggestion:
+          type: string
+      required: [field, label, importance]
+
+    ProjectAnalysis:
+      type: object
+      properties:
+        missingFields:
+          type: array
+          items:
+            $ref: "#/components/schemas/MissingField"
+        executiveSummary:
+          type: string
+        campaignGoals:
+          type: array
+          items:
+            type: string
+        targetAudience:
+          type: string
+        deliverables:
+          type: array
+          items:
+            type: string
+        recommendations:
+          type: array
+          items:
+            type: string
+        riskFactors:
+          type: array
+          items:
+            type: string
+      required:
+        - missingFields
+        - executiveSummary
+        - campaignGoals
+        - targetAudience
+        - deliverables
+        - recommendations
+        - riskFactors
+
+    ChatMessageInput:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+      required: [role, content]
+
+    ChatRequest:
+      type: object
+      properties:
+        projectId:
+          type: integer
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessageInput"
+      required: [projectId, messages]
+
+    # ── Document schemas ──────────────────────────────────────────────────────
+    DocumentType:
+      type: string
+      enum: [proposal, contract, presentation, invoice]
+
+    GeneratedDocument:
+      type: object
+      properties:
+        id:
+          type: integer
+        projectId:
+          type: integer
+        projectName:
+          type: ["string", "null"]
+        clientName:
+          type: ["string", "null"]
+        type:
+          $ref: "#/components/schemas/DocumentType"
+        title:
+          type: string
+        content:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+      required: [id, projectId, type, title, content, createdAt]
+
+    GenerateDocumentRequest:
+      type: object
+      properties:
+        projectId:
+          type: integer
+        type:
+          $ref: "#/components/schemas/DocumentType"
+      required: [projectId, type]

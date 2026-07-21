@@ -22,16 +22,21 @@ import type {
 import type {
   ActivityEntry,
   AuthResponse,
+  ChatRequest,
   Client,
   ClientInput,
   ClientUpdate,
   DashboardStats,
+  DeleteDocument200,
   ErrorResponse,
   FileUpload,
+  GenerateDocumentRequest,
+  GeneratedDocument,
   GetRecentProjectsParams,
   HealthStatus,
   ListActivityParams,
   ListClientsParams,
+  ListDocumentsParams,
   ListNotificationsParams,
   ListProjectsParams,
   ListTasksParams,
@@ -39,6 +44,7 @@ import type {
   LoginInput,
   Notification,
   Project,
+  ProjectAnalysis,
   ProjectInput,
   ProjectMember,
   ProjectMemberInput,
@@ -2574,4 +2580,449 @@ export function useGetRecentProjects<TData = Awaited<ReturnType<typeof getRecent
 
 
 
+
+export const getAnalyzeProjectUrl = (projectId: number,) => {
+
+
+
+
+  return `/api/ai/analyze/${projectId}`
+}
+
+/**
+ * @summary Analyze a project with AI — detect missing fields and generate insights
+ */
+export const analyzeProject = async (projectId: number, options?: RequestInit): Promise<ProjectAnalysis> => {
+
+  return customFetch<ProjectAnalysis>(getAnalyzeProjectUrl(projectId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getAnalyzeProjectMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof analyzeProject>>, TError,{projectId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof analyzeProject>>, TError,{projectId: number}, TContext> => {
+
+const mutationKey = ['analyzeProject'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof analyzeProject>>, {projectId: number}> = (props) => {
+          const {projectId} = props ?? {};
+
+          return  analyzeProject(projectId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AnalyzeProjectMutationResult = NonNullable<Awaited<ReturnType<typeof analyzeProject>>>
+
+    export type AnalyzeProjectMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Analyze a project with AI — detect missing fields and generate insights
+ */
+export const useAnalyzeProject = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof analyzeProject>>, TError,{projectId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof analyzeProject>>,
+        TError,
+        {projectId: number},
+        TContext
+      > => {
+      return useMutation(getAnalyzeProjectMutationOptions(options));
+    }
+
+export const getChatWithAIUrl = () => {
+
+
+
+
+  return `/api/ai/chat`
+}
+
+/**
+ * @summary Chat with AI about a project (SSE streaming)
+ */
+export const chatWithAI = async (chatRequest: ChatRequest, options?: RequestInit): Promise<string> => {
+
+  return customFetch<string>(getChatWithAIUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(chatRequest)
+  }
+);}
+
+
+
+
+
+export const getChatWithAIMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatWithAI>>, TError,{data: BodyType<ChatRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof chatWithAI>>, TError,{data: BodyType<ChatRequest>}, TContext> => {
+
+const mutationKey = ['chatWithAI'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof chatWithAI>>, {data: BodyType<ChatRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  chatWithAI(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChatWithAIMutationResult = NonNullable<Awaited<ReturnType<typeof chatWithAI>>>
+    export type ChatWithAIMutationBody = BodyType<ChatRequest>
+    export type ChatWithAIMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Chat with AI about a project (SSE streaming)
+ */
+export const useChatWithAI = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof chatWithAI>>, TError,{data: BodyType<ChatRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof chatWithAI>>,
+        TError,
+        {data: BodyType<ChatRequest>},
+        TContext
+      > => {
+      return useMutation(getChatWithAIMutationOptions(options));
+    }
+
+export const getListDocumentsUrl = (params?: ListDocumentsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/documents?${stringifiedParams}` : `/api/documents`
+}
+
+/**
+ * @summary List all generated documents for the current user
+ */
+export const listDocuments = async (params?: ListDocumentsParams, options?: RequestInit): Promise<GeneratedDocument[]> => {
+
+  return customFetch<GeneratedDocument[]>(getListDocumentsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListDocumentsQueryKey = (params?: ListDocumentsParams,) => {
+    return [
+    `/api/documents`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListDocumentsQueryOptions = <TData = Awaited<ReturnType<typeof listDocuments>>, TError = ErrorType<ErrorResponse>>(params?: ListDocumentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listDocuments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListDocumentsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listDocuments>>> = ({ signal }) => listDocuments(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listDocuments>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListDocumentsQueryResult = NonNullable<Awaited<ReturnType<typeof listDocuments>>>
+export type ListDocumentsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List all generated documents for the current user
+ */
+
+export function useListDocuments<TData = Awaited<ReturnType<typeof listDocuments>>, TError = ErrorType<ErrorResponse>>(
+ params?: ListDocumentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listDocuments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListDocumentsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGenerateDocumentUrl = () => {
+
+
+
+
+  return `/api/documents/generate`
+}
+
+/**
+ * @summary Generate a document using AI and save it
+ */
+export const generateDocument = async (generateDocumentRequest: GenerateDocumentRequest, options?: RequestInit): Promise<GeneratedDocument> => {
+
+  return customFetch<GeneratedDocument>(getGenerateDocumentUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(generateDocumentRequest)
+  }
+);}
+
+
+
+
+
+export const getGenerateDocumentMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateDocument>>, TError,{data: BodyType<GenerateDocumentRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof generateDocument>>, TError,{data: BodyType<GenerateDocumentRequest>}, TContext> => {
+
+const mutationKey = ['generateDocument'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateDocument>>, {data: BodyType<GenerateDocumentRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  generateDocument(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GenerateDocumentMutationResult = NonNullable<Awaited<ReturnType<typeof generateDocument>>>
+    export type GenerateDocumentMutationBody = BodyType<GenerateDocumentRequest>
+    export type GenerateDocumentMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Generate a document using AI and save it
+ */
+export const useGenerateDocument = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateDocument>>, TError,{data: BodyType<GenerateDocumentRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof generateDocument>>,
+        TError,
+        {data: BodyType<GenerateDocumentRequest>},
+        TContext
+      > => {
+      return useMutation(getGenerateDocumentMutationOptions(options));
+    }
+
+export const getGetDocumentUrl = (id: number,) => {
+
+
+
+
+  return `/api/documents/${id}`
+}
+
+/**
+ * @summary Get a single generated document
+ */
+export const getDocument = async (id: number, options?: RequestInit): Promise<GeneratedDocument> => {
+
+  return customFetch<GeneratedDocument>(getGetDocumentUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDocumentQueryKey = (id: number,) => {
+    return [
+    `/api/documents/${id}`
+    ] as const;
+    }
+
+
+export const getGetDocumentQueryOptions = <TData = Awaited<ReturnType<typeof getDocument>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDocument>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDocumentQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDocument>>> = ({ signal }) => getDocument(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDocument>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetDocumentQueryResult = NonNullable<Awaited<ReturnType<typeof getDocument>>>
+export type GetDocumentQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get a single generated document
+ */
+
+export function useGetDocument<TData = Awaited<ReturnType<typeof getDocument>>, TError = ErrorType<ErrorResponse>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getDocument>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetDocumentQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getDeleteDocumentUrl = (id: number,) => {
+
+
+
+
+  return `/api/documents/${id}`
+}
+
+/**
+ * @summary Delete a generated document
+ */
+export const deleteDocument = async (id: number, options?: RequestInit): Promise<DeleteDocument200> => {
+
+  return customFetch<DeleteDocument200>(getDeleteDocumentUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteDocumentMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDocument>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteDocument>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteDocument'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteDocument>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteDocument(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteDocumentMutationResult = NonNullable<Awaited<ReturnType<typeof deleteDocument>>>
+
+    export type DeleteDocumentMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Delete a generated document
+ */
+export const useDeleteDocument = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDocument>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteDocument>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteDocumentMutationOptions(options));
+    }
 
