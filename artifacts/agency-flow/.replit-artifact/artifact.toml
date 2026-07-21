@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "AgencyFlow AI"
+version = "1.0.0"
+id = "artifacts/agency-flow"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22730
+
+[services.development]
+run = "pnpm --filter @workspace/agency-flow run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/agency-flow", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/agency-flow/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22730"
+BASE_PATH = "/"
