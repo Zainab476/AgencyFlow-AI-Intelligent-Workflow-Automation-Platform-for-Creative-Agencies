@@ -3,6 +3,7 @@ import { db, projectsTable, clientsTable } from "@workspace/db";
 import { eq, and, ilike, sql } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
 import { CreateProjectBody, UpdateProjectBody } from "@workspace/api-zod";
+import { logActivity } from "../lib/activity";
 
 const router = Router();
 
@@ -83,7 +84,14 @@ router.post("/", async (req, res) => {
     })
     .returning();
 
-  res.status(201).json(formatProject(project, client.companyName));
+  await logActivity({
+    userId,
+    projectId: project!.id,
+    action: "project_created",
+    description: `Campaign "${campaignName}" created`,
+  });
+
+  res.status(201).json(formatProject(project!, client.companyName));
 });
 
 // GET /api/projects/:id
@@ -157,7 +165,14 @@ router.put("/:id", async (req, res) => {
     .where(eq(clientsTable.id, updated.clientId))
     .limit(1);
 
-  res.json(formatProject(updated, clientRow?.companyName));
+  await logActivity({
+    userId,
+    projectId: id,
+    action: "project_updated",
+    description: `Campaign "${updated!.campaignName}" updated`,
+  });
+
+  res.json(formatProject(updated!, clientRow?.companyName));
 });
 
 // DELETE /api/projects/:id

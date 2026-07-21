@@ -1,0 +1,5 @@
+- [File upload pattern](file-upload-pattern.md) — multipart uploads skip Orval codegen (no requestBody in spec); use raw fetch + FormData on client.
+- [mergeParams TypeScript](mergeparams-typescript.md) — Express mergeParams:true requires `req.params as Record<string, string>` cast; TypeScript doesn't infer inherited params.
+- [Zod v3 codegen](zod-v3-codegen.md) — Orval targets Zod v3; never add format:email or multipart file fields to OpenAPI spec — both generate v4-only syntax.
+- [DB libs rebuild](db-libs-rebuild.md) — after any lib/db/src/schema change, run `pnpm run typecheck:libs` before leaf artifact typechecks.
+- [SidebarContent hook rule](sidebar-content-hook.md) — inner component functions defined as consts inside a parent component must be closed with `};` not just `);`.

@@ -305,6 +305,370 @@ export const GetDashboardStatsResponse = zod.object({
 
 
 /**
+ * @summary List team members for a project
+ */
+export const ListProjectMembersParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ListProjectMembersResponseItem = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "role": zod.enum(['project_manager', 'designer', 'copywriter', 'marketing_specialist']),
+  "createdAt": zod.string()
+})
+export const ListProjectMembersResponse = zod.array(ListProjectMembersResponseItem)
+
+
+/**
+ * @summary Add a team member to a project
+ */
+export const AddProjectMemberParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const AddProjectMemberBody = zod.object({
+  "name": zod.string().min(1),
+  "email": zod.string(),
+  "role": zod.enum(['project_manager', 'designer', 'copywriter', 'marketing_specialist'])
+})
+
+export const AddProjectMemberResponse = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "role": zod.enum(['project_manager', 'designer', 'copywriter', 'marketing_specialist']),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Update a team member
+ */
+export const UpdateProjectMemberParams = zod.object({
+  "id": zod.coerce.number(),
+  "memberId": zod.coerce.number()
+})
+
+
+
+
+export const UpdateProjectMemberBody = zod.object({
+  "name": zod.string().min(1).optional(),
+  "email": zod.string().optional(),
+  "role": zod.enum(['project_manager', 'designer', 'copywriter', 'marketing_specialist']).optional()
+})
+
+export const UpdateProjectMemberResponse = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "role": zod.enum(['project_manager', 'designer', 'copywriter', 'marketing_specialist']),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Remove a team member
+ */
+export const RemoveProjectMemberParams = zod.object({
+  "id": zod.coerce.number(),
+  "memberId": zod.coerce.number()
+})
+
+export const RemoveProjectMemberResponse = zod.object({
+  "success": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary List tasks
+ */
+export const ListTasksQueryParams = zod.object({
+  "projectId": zod.coerce.number().optional(),
+  "status": zod.enum(['todo', 'in_progress', 'review', 'done']).optional(),
+  "priority": zod.enum(['low', 'medium', 'high', 'urgent']).optional(),
+  "assignedMemberId": zod.coerce.number().optional(),
+  "search": zod.coerce.string().optional()
+})
+
+export const ListTasksResponseItem = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "projectName": zod.string().nullish(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "assignedMemberId": zod.number().nullish(),
+  "assignedMemberName": zod.string().nullish(),
+  "dueDate": zod.string().nullish(),
+  "priority": zod.enum(['low', 'medium', 'high', 'urgent']),
+  "status": zod.enum(['todo', 'in_progress', 'review', 'done']),
+  "createdAt": zod.string()
+})
+export const ListTasksResponse = zod.array(ListTasksResponseItem)
+
+
+/**
+ * @summary Create a task
+ */
+
+
+
+export const CreateTaskBody = zod.object({
+  "projectId": zod.number(),
+  "title": zod.string().min(1),
+  "description": zod.string().optional(),
+  "assignedMemberId": zod.number().optional(),
+  "dueDate": zod.string().optional(),
+  "priority": zod.enum(['low', 'medium', 'high', 'urgent']).optional(),
+  "status": zod.enum(['todo', 'in_progress', 'review', 'done']).optional()
+})
+
+export const CreateTaskResponse = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "projectName": zod.string().nullish(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "assignedMemberId": zod.number().nullish(),
+  "assignedMemberName": zod.string().nullish(),
+  "dueDate": zod.string().nullish(),
+  "priority": zod.enum(['low', 'medium', 'high', 'urgent']),
+  "status": zod.enum(['todo', 'in_progress', 'review', 'done']),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Get a task by ID
+ */
+export const GetTaskParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetTaskResponse = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "projectName": zod.string().nullish(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "assignedMemberId": zod.number().nullish(),
+  "assignedMemberName": zod.string().nullish(),
+  "dueDate": zod.string().nullish(),
+  "priority": zod.enum(['low', 'medium', 'high', 'urgent']),
+  "status": zod.enum(['todo', 'in_progress', 'review', 'done']),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Update a task
+ */
+export const UpdateTaskParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+
+
+
+export const UpdateTaskBody = zod.object({
+  "title": zod.string().min(1).optional(),
+  "description": zod.string().optional(),
+  "assignedMemberId": zod.number().optional(),
+  "dueDate": zod.string().optional(),
+  "priority": zod.enum(['low', 'medium', 'high', 'urgent']).optional(),
+  "status": zod.enum(['todo', 'in_progress', 'review', 'done']).optional()
+})
+
+export const UpdateTaskResponse = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "projectName": zod.string().nullish(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "assignedMemberId": zod.number().nullish(),
+  "assignedMemberName": zod.string().nullish(),
+  "dueDate": zod.string().nullish(),
+  "priority": zod.enum(['low', 'medium', 'high', 'urgent']),
+  "status": zod.enum(['todo', 'in_progress', 'review', 'done']),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a task
+ */
+export const DeleteTaskParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteTaskResponse = zod.object({
+  "success": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary Update task status (for kanban drag-drop)
+ */
+export const UpdateTaskStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateTaskStatusBody = zod.object({
+  "status": zod.enum(['todo', 'in_progress', 'review', 'done'])
+})
+
+export const UpdateTaskStatusResponse = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "projectName": zod.string().nullish(),
+  "title": zod.string(),
+  "description": zod.string().nullish(),
+  "assignedMemberId": zod.number().nullish(),
+  "assignedMemberName": zod.string().nullish(),
+  "dueDate": zod.string().nullish(),
+  "priority": zod.enum(['low', 'medium', 'high', 'urgent']),
+  "status": zod.enum(['todo', 'in_progress', 'review', 'done']),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary List notifications for current user
+ */
+export const ListNotificationsQueryParams = zod.object({
+  "unreadOnly": zod.coerce.boolean().optional()
+})
+
+export const ListNotificationsResponseItem = zod.object({
+  "id": zod.number(),
+  "type": zod.enum(['deadline', 'assignment', 'completion']),
+  "title": zod.string(),
+  "message": zod.string(),
+  "read": zod.boolean(),
+  "projectId": zod.number().nullish(),
+  "taskId": zod.number().nullish(),
+  "createdAt": zod.string()
+})
+export const ListNotificationsResponse = zod.array(ListNotificationsResponseItem)
+
+
+/**
+ * @summary Mark all notifications as read
+ */
+export const MarkAllNotificationsReadResponse = zod.object({
+  "success": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary Mark a notification as read
+ */
+export const MarkNotificationReadParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const MarkNotificationReadResponse = zod.object({
+  "id": zod.number(),
+  "type": zod.enum(['deadline', 'assignment', 'completion']),
+  "title": zod.string(),
+  "message": zod.string(),
+  "read": zod.boolean(),
+  "projectId": zod.number().nullish(),
+  "taskId": zod.number().nullish(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary List activity log entries
+ */
+export const listActivityQueryLimitDefault = 20;
+
+export const ListActivityQueryParams = zod.object({
+  "projectId": zod.coerce.number().optional(),
+  "limit": zod.coerce.number().default(listActivityQueryLimitDefault)
+})
+
+export const ListActivityResponseItem = zod.object({
+  "id": zod.number(),
+  "action": zod.enum(['project_created', 'project_updated', 'task_created', 'task_completed', 'task_updated', 'member_added', 'member_removed', 'file_uploaded']),
+  "description": zod.string(),
+  "projectId": zod.number().nullish(),
+  "projectName": zod.string().nullish(),
+  "taskId": zod.number().nullish(),
+  "createdAt": zod.string()
+})
+export const ListActivityResponse = zod.array(ListActivityResponseItem)
+
+
+/**
+ * @summary List uploaded files
+ */
+export const ListUploadsQueryParams = zod.object({
+  "projectId": zod.coerce.number().optional(),
+  "taskId": zod.coerce.number().optional()
+})
+
+export const ListUploadsResponseItem = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "taskId": zod.number().nullish(),
+  "filename": zod.string(),
+  "originalName": zod.string(),
+  "mimeType": zod.string(),
+  "size": zod.number(),
+  "url": zod.string(),
+  "createdAt": zod.string()
+})
+export const ListUploadsResponse = zod.array(ListUploadsResponseItem)
+
+
+/**
+ * @summary Upload a file (multipart/form-data — call directly with FormData, not the generated hook)
+ */
+export const UploadFileQueryParams = zod.object({
+  "projectId": zod.coerce.number(),
+  "taskId": zod.coerce.number().optional()
+})
+
+export const UploadFileResponse = zod.object({
+  "id": zod.number(),
+  "projectId": zod.number(),
+  "taskId": zod.number().nullish(),
+  "filename": zod.string(),
+  "originalName": zod.string(),
+  "mimeType": zod.string(),
+  "size": zod.number(),
+  "url": zod.string(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Delete an uploaded file
+ */
+export const DeleteUploadParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteUploadResponse = zod.object({
+  "success": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
  * @summary Get recent projects for the dashboard
  */
 export const getRecentProjectsQueryLimitDefault = 5;

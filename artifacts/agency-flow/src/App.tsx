@@ -13,6 +13,9 @@ import ClientDetail from '@/pages/ClientDetail';
 import Projects from '@/pages/Projects';
 import ProjectDetail from '@/pages/ProjectDetail';
 import Profile from '@/pages/Profile';
+import Tasks from '@/pages/Tasks';
+import Notifications from '@/pages/Notifications';
+import ActivityLog from '@/pages/ActivityLog';
 import NotFound from '@/pages/not-found';
 
 const queryClient = new QueryClient({
@@ -69,6 +72,15 @@ function Router() {
       </Route>
       <Route path="/profile">
         {() => <ProtectedRoute component={Profile} path="/profile" />}
+      </Route>
+      <Route path="/tasks">
+        {() => <ProtectedRoute component={Tasks} path="/tasks" />}
+      </Route>
+      <Route path="/notifications">
+        {() => <ProtectedRoute component={Notifications} path="/notifications" />}
+      </Route>
+      <Route path="/activity">
+        {() => <ProtectedRoute component={ActivityLog} path="/activity" />}
       </Route>
       
       <Route component={NotFound} />
