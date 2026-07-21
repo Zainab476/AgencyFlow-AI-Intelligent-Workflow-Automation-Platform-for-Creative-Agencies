@@ -32,6 +32,8 @@ tags:
     description: AI project assistant
   - name: documents
     description: Document generation
+  - name: sheets
+    description: Google Sheets sync
 
 paths:
   /healthz:
@@ -1276,6 +1278,295 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  # ── Google Sheets paths ──────────────────────────────────────────────────────
+  /sheets/connections:
+    get:
+      operationId: listSheetConnections
+      tags: [sheets]
+      summary: List connected spreadsheets
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of sheet connections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SheetConnection"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createSheetConnection
+      tags: [sheets]
+      summary: Connect a Google Spreadsheet
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SheetConnectionCreate"
+      responses:
+        "201":
+          description: Connection created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SheetConnection"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /sheets/connections/{id}:
+    patch:
+      operationId: updateSheetConnection
+      tags: [sheets]
+      summary: Update column mapping or tab name
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SheetConnectionUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SheetConnection"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteSheetConnection
+      tags: [sheets]
+      summary: Remove a spreadsheet connection
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /sheets/connections/{id}/headers:
+    get:
+      operationId: getSheetHeaders
+      tags: [sheets]
+      summary: Get sheet column headers for mapping
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Headers and target fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SheetHeadersResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /sheets/connections/{id}/preview:
+    get:
+      operationId: previewSheetRows
+      tags: [sheets]
+      summary: Preview first 10 rows of a spreadsheet
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Row preview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SheetPreviewResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /sheets/connections/{id}/sync:
+    post:
+      operationId: syncSheet
+      tags: [sheets]
+      summary: Run a sync from the spreadsheet
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Sync result (may include pending conflicts)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SyncResult"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Sync error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /sheets/history:
+    get:
+      operationId: listSyncHistory
+      tags: [sheets]
+      summary: List sync history records
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Sync history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SyncHistoryItem"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /sheets/history/{historyId}/confirm:
+    post:
+      operationId: confirmSyncResolutions
+      tags: [sheets]
+      summary: Resolve sync conflicts
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: historyId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyncConfirmRequest"
+      responses:
+        "200":
+          description: Resolutions applied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  summary:
+                    $ref: "#/components/schemas/SyncSummary"
+                required: [success, summary]
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /sheets/target-fields:
+    get:
+      operationId: getTargetFields
+      tags: [sheets]
+      summary: Get available sync target fields
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Target fields map
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
+                  properties:
+                    label:
+                      type: string
+                    entity:
+                      type: string
+                  required: [label, entity]
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1891,3 +2182,204 @@ components:
         type:
           $ref: "#/components/schemas/DocumentType"
       required: [projectId, type]
+
+    # ── Sheets schemas ────────────────────────────────────────────────────────
+    SheetConnection:
+      type: object
+      properties:
+        id:
+          type: integer
+        userId:
+          type: integer
+        spreadsheetId:
+          type: string
+        spreadsheetName:
+          type: string
+        tabName:
+          type: string
+        columnMapping:
+          type: object
+          additionalProperties:
+            type: string
+        lastSyncAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required: [id, userId, spreadsheetId, spreadsheetName, tabName, columnMapping, createdAt]
+
+    SheetConnectionCreate:
+      type: object
+      properties:
+        urlOrId:
+          type: string
+        tabName:
+          type: string
+        columnMapping:
+          type: object
+          additionalProperties:
+            type: string
+      required: [urlOrId]
+
+    SheetConnectionUpdate:
+      type: object
+      properties:
+        tabName:
+          type: string
+        columnMapping:
+          type: object
+          additionalProperties:
+            type: string
+
+    SheetHeadersResponse:
+      type: object
+      properties:
+        headers:
+          type: array
+          items:
+            type: string
+        targetFields:
+          type: object
+          additionalProperties:
+            type: object
+            properties:
+              label:
+                type: string
+              entity:
+                type: string
+            required: [label, entity]
+      required: [headers, targetFields]
+
+    SheetPreviewResponse:
+      type: object
+      properties:
+        headers:
+          type: array
+          items:
+            type: string
+        rows:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        columnMapping:
+          type: object
+          additionalProperties:
+            type: string
+      required: [headers, rows, columnMapping]
+
+    SyncSummary:
+      type: object
+      properties:
+        created:
+          type: integer
+        updated:
+          type: integer
+        skipped:
+          type: integer
+        conflictsFound:
+          type: integer
+        conflictsResolved:
+          type: integer
+        errors:
+          type: array
+          items:
+            type: string
+      required: [created, updated, skipped, conflictsFound, conflictsResolved, errors]
+
+    SyncConflictField:
+      type: object
+      properties:
+        field:
+          type: string
+        label:
+          type: string
+        entity:
+          type: string
+        currentValue:
+          type: ["string", "null"]
+        sheetValue:
+          type: string
+        lastSyncedValue:
+          type: ["string", "null"]
+      required: [field, label, entity, sheetValue]
+
+    SyncConflict:
+      type: object
+      properties:
+        rowIndex:
+          type: integer
+        campaignName:
+          type: string
+        projectId:
+          type: integer
+        clientId:
+          type: ["integer", "null"]
+        isFirstSync:
+          type: boolean
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/SyncConflictField"
+      required: [rowIndex, campaignName, projectId, isFirstSync, fields]
+
+    SyncResult:
+      type: object
+      properties:
+        historyId:
+          type: integer
+        summary:
+          $ref: "#/components/schemas/SyncSummary"
+        conflicts:
+          type: array
+          items:
+            $ref: "#/components/schemas/SyncConflict"
+      required: [historyId, summary, conflicts]
+
+    SyncResolution:
+      type: object
+      properties:
+        projectId:
+          type: integer
+        clientId:
+          type: ["integer", "null"]
+        field:
+          type: string
+        accept:
+          type: boolean
+      required: [projectId, field, accept]
+
+    SyncConfirmRequest:
+      type: object
+      properties:
+        resolutions:
+          type: array
+          items:
+            $ref: "#/components/schemas/SyncResolution"
+      required: [resolutions]
+
+    SyncHistoryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        connectionId:
+          type: integer
+        status:
+          type: string
+        summary:
+          type: object
+          additionalProperties: true
+        rowsProcessed:
+          type: integer
+        errors:
+          type: object
+          additionalProperties: true
+        pendingConflicts:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+        spreadsheetName:
+          type: ["string", "null"]
+      required: [id, connectionId, status, rowsProcessed, createdAt]

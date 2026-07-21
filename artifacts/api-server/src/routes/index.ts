@@ -11,6 +11,7 @@ import activityRouter from "./activity";
 import uploadsRouter from "./uploads";
 import aiRouter from "./ai";
 import documentsRouter from "./documents";
+import sheetsRouter from "./sheets";
 
 const router = Router();
 
@@ -26,5 +27,6 @@ router.use("/activity", activityRouter);
 router.use("/uploads", uploadsRouter);
 router.use("/ai", aiRouter);
 router.use("/documents", documentsRouter);
+router.use("/sheets", sheetsRouter);
 
 export default router;

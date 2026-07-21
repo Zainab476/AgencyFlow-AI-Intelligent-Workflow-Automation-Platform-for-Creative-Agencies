@@ -799,3 +799,196 @@ export const DeleteDocumentResponse = zod.object({
 })
 
 
+/**
+ * @summary List connected spreadsheets
+ */
+export const ListSheetConnectionsResponseItem = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "spreadsheetId": zod.string(),
+  "spreadsheetName": zod.string(),
+  "tabName": zod.string(),
+  "columnMapping": zod.record(zod.string(), zod.string()),
+  "lastSyncAt": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+export const ListSheetConnectionsResponse = zod.array(ListSheetConnectionsResponseItem)
+
+
+/**
+ * @summary Connect a Google Spreadsheet
+ */
+export const CreateSheetConnectionBody = zod.object({
+  "urlOrId": zod.string(),
+  "tabName": zod.string().optional(),
+  "columnMapping": zod.record(zod.string(), zod.string()).optional()
+})
+
+export const CreateSheetConnectionResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "spreadsheetId": zod.string(),
+  "spreadsheetName": zod.string(),
+  "tabName": zod.string(),
+  "columnMapping": zod.record(zod.string(), zod.string()),
+  "lastSyncAt": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Update column mapping or tab name
+ */
+export const UpdateSheetConnectionParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateSheetConnectionBody = zod.object({
+  "tabName": zod.string().optional(),
+  "columnMapping": zod.record(zod.string(), zod.string()).optional()
+})
+
+export const UpdateSheetConnectionResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "spreadsheetId": zod.string(),
+  "spreadsheetName": zod.string(),
+  "tabName": zod.string(),
+  "columnMapping": zod.record(zod.string(), zod.string()),
+  "lastSyncAt": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Remove a spreadsheet connection
+ */
+export const DeleteSheetConnectionParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteSheetConnectionResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Get sheet column headers for mapping
+ */
+export const GetSheetHeadersParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetSheetHeadersResponse = zod.object({
+  "headers": zod.array(zod.string()),
+  "targetFields": zod.record(zod.string(), zod.object({
+  "label": zod.string(),
+  "entity": zod.string()
+}))
+})
+
+
+/**
+ * @summary Preview first 10 rows of a spreadsheet
+ */
+export const PreviewSheetRowsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const PreviewSheetRowsResponse = zod.object({
+  "headers": zod.array(zod.string()),
+  "rows": zod.array(zod.array(zod.string())),
+  "columnMapping": zod.record(zod.string(), zod.string())
+})
+
+
+/**
+ * @summary Run a sync from the spreadsheet
+ */
+export const SyncSheetParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const SyncSheetResponse = zod.object({
+  "historyId": zod.number(),
+  "summary": zod.object({
+  "created": zod.number(),
+  "updated": zod.number(),
+  "skipped": zod.number(),
+  "conflictsFound": zod.number(),
+  "conflictsResolved": zod.number(),
+  "errors": zod.array(zod.string())
+}),
+  "conflicts": zod.array(zod.object({
+  "rowIndex": zod.number(),
+  "campaignName": zod.string(),
+  "projectId": zod.number(),
+  "clientId": zod.number().nullish(),
+  "isFirstSync": zod.boolean(),
+  "fields": zod.array(zod.object({
+  "field": zod.string(),
+  "label": zod.string(),
+  "entity": zod.string(),
+  "currentValue": zod.string().nullish(),
+  "sheetValue": zod.string(),
+  "lastSyncedValue": zod.string().nullish()
+}))
+}))
+})
+
+
+/**
+ * @summary List sync history records
+ */
+export const ListSyncHistoryResponseItem = zod.object({
+  "id": zod.number(),
+  "connectionId": zod.number(),
+  "status": zod.string(),
+  "summary": zod.record(zod.string(), zod.unknown()).optional(),
+  "rowsProcessed": zod.number(),
+  "errors": zod.record(zod.string(), zod.unknown()).optional(),
+  "pendingConflicts": zod.record(zod.string(), zod.unknown()).optional(),
+  "createdAt": zod.string(),
+  "spreadsheetName": zod.string().nullish()
+})
+export const ListSyncHistoryResponse = zod.array(ListSyncHistoryResponseItem)
+
+
+/**
+ * @summary Resolve sync conflicts
+ */
+export const ConfirmSyncResolutionsParams = zod.object({
+  "historyId": zod.coerce.number()
+})
+
+export const ConfirmSyncResolutionsBody = zod.object({
+  "resolutions": zod.array(zod.object({
+  "projectId": zod.number(),
+  "clientId": zod.number().nullish(),
+  "field": zod.string(),
+  "accept": zod.boolean()
+}))
+})
+
+export const ConfirmSyncResolutionsResponse = zod.object({
+  "success": zod.boolean(),
+  "summary": zod.object({
+  "created": zod.number(),
+  "updated": zod.number(),
+  "skipped": zod.number(),
+  "conflictsFound": zod.number(),
+  "conflictsResolved": zod.number(),
+  "errors": zod.array(zod.string())
+})
+})
+
+
+/**
+ * @summary Get available sync target fields
+ */
+export const GetTargetFieldsResponse = zod.record(zod.string(), zod.object({
+  "label": zod.string(),
+  "entity": zod.string()
+}))
+
+

@@ -1,16 +1,7 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { useEffect, useState, ReactNode } from 'react';
 import { useLocation } from 'wouter';
 import { setAuthTokenGetter } from '@workspace/api-client-react';
-
-interface AuthContextType {
-  token: string | null;
-  isAuthenticated: boolean;
-  login: (token: string) => void;
-  logout: () => void;
-  isInitializing: boolean;
-}
-
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext } from './authContext';
 
 const TOKEN_KEY = 'af_token';
 

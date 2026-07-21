@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'wouter';
 import { 
   Users, 
@@ -5,21 +6,36 @@ import {
   Activity, 
   DollarSign,
   ArrowRight,
-  TrendingUp
+  TrendingUp,
+  RefreshCw,
+  Loader2,
+  Table2
 } from 'lucide-react';
 import { 
   useGetDashboardStats, 
   useGetRecentProjects,
+  useListSheetConnections,
+  useSyncSheet,
   getGetDashboardStatsQueryKey,
-  getGetRecentProjectsQueryKey
+  getGetRecentProjectsQueryKey,
+  getListSheetConnectionsQueryKey,
+  getListSyncHistoryQueryKey,
 } from '@workspace/api-client-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProjectStatusBadge } from '@/components/ProjectStatusBadge';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
+import SyncConflictDialog from '@/components/sheets/SyncConflictDialog';
+import type { SyncResult } from '@workspace/api-client-react';
 
 export default function Dashboard() {
+  const qc = useQueryClient();
+  const [conflictResult, setConflictResult] = useState<SyncResult | null>(null);
+  const [syncingId, setSyncingId] = useState<number | null>(null);
+
   const { data: stats, isLoading: isStatsLoading } = useGetDashboardStats({
     query: { queryKey: getGetDashboardStatsQueryKey() }
   });
@@ -29,6 +45,39 @@ export default function Dashboard() {
     { query: { queryKey: getGetRecentProjectsQueryKey({ limit: 5 }) } }
   );
 
+  const { data: connections = [] } = useListSheetConnections({
+    query: { queryKey: getListSheetConnectionsQueryKey() },
+  });
+
+  const syncMutation = useSyncSheet({
+    mutation: {
+      onSuccess: (result) => {
+        setSyncingId(null);
+        if (result.conflicts && result.conflicts.length > 0) {
+          setConflictResult(result);
+        } else {
+          const s = result.summary;
+          toast.success(`Sync complete — ${s.created} created, ${s.updated} updated`);
+          qc.invalidateQueries({ queryKey: getGetDashboardStatsQueryKey() });
+          qc.invalidateQueries({ queryKey: getGetRecentProjectsQueryKey({ limit: 5 }) });
+        }
+        qc.invalidateQueries({ queryKey: getListSheetConnectionsQueryKey() });
+        qc.invalidateQueries({ queryKey: getListSyncHistoryQueryKey() });
+      },
+      onError: (err: any) => {
+        setSyncingId(null);
+        toast.error(err?.response?.data?.error ?? 'Sync failed');
+      },
+    },
+  });
+
+  const handleQuickSync = () => {
+    if (connections.length === 0) return;
+    const first = connections[0];
+    setSyncingId(first.id);
+    syncMutation.mutate({ id: first.id });
+  };
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -37,6 +86,8 @@ export default function Dashboard() {
     }).format(amount);
   };
 
+  const isSyncing = syncingId !== null;
+
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -44,7 +95,24 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold tracking-tight">Overview</h1>
           <p className="text-muted-foreground mt-1 text-lg">Here's what's happening across your agency today.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 flex-wrap">
+          {connections.length > 0 ? (
+            <Button
+              variant="outline"
+              className="shadow-sm gap-2"
+              onClick={handleQuickSync}
+              disabled={isSyncing}
+            >
+              {isSyncing
+                ? <Loader2 className="h-4 w-4 animate-spin" />
+                : <RefreshCw className="h-4 w-4" />}
+              Sync Sheets
+            </Button>
+          ) : (
+            <Button asChild variant="outline" className="shadow-sm gap-2">
+              <Link href="/sheets"><Table2 className="h-4 w-4" />Connect Sheets</Link>
+            </Button>
+          )}
           <Button asChild variant="outline" className="shadow-sm">
             <Link href="/clients">Manage Clients</Link>
           </Button>
@@ -53,6 +121,20 @@ export default function Dashboard() {
           </Button>
         </div>
       </div>
+
+      {conflictResult && (
+        <SyncConflictDialog
+          open={!!conflictResult}
+          onOpenChange={(open) => { if (!open) setConflictResult(null); }}
+          result={conflictResult}
+          onResolved={() => {
+            setConflictResult(null);
+            qc.invalidateQueries({ queryKey: getGetDashboardStatsQueryKey() });
+            qc.invalidateQueries({ queryKey: getGetRecentProjectsQueryKey({ limit: 5 }) });
+            toast.success('Conflicts resolved — sync complete');
+          }}
+        />
+      )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card className="hover-elevate transition-all border-border/50 shadow-sm">

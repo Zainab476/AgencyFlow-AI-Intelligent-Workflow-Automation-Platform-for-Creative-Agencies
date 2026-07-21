@@ -364,6 +364,120 @@ export interface GenerateDocumentRequest {
   type: DocumentType;
 }
 
+export type SheetConnectionColumnMapping = {[key: string]: string};
+
+export interface SheetConnection {
+  id: number;
+  userId: number;
+  spreadsheetId: string;
+  spreadsheetName: string;
+  tabName: string;
+  columnMapping: SheetConnectionColumnMapping;
+  /** @nullable */
+  lastSyncAt?: string | null;
+  createdAt: string;
+}
+
+export type SheetConnectionCreateColumnMapping = {[key: string]: string};
+
+export interface SheetConnectionCreate {
+  urlOrId: string;
+  tabName?: string;
+  columnMapping?: SheetConnectionCreateColumnMapping;
+}
+
+export type SheetConnectionUpdateColumnMapping = {[key: string]: string};
+
+export interface SheetConnectionUpdate {
+  tabName?: string;
+  columnMapping?: SheetConnectionUpdateColumnMapping;
+}
+
+export type SheetHeadersResponseTargetFields = {[key: string]: {
+  label: string;
+  entity: string;
+}};
+
+export interface SheetHeadersResponse {
+  headers: string[];
+  targetFields: SheetHeadersResponseTargetFields;
+}
+
+export type SheetPreviewResponseColumnMapping = {[key: string]: string};
+
+export interface SheetPreviewResponse {
+  headers: string[];
+  rows: string[][];
+  columnMapping: SheetPreviewResponseColumnMapping;
+}
+
+export interface SyncSummary {
+  created: number;
+  updated: number;
+  skipped: number;
+  conflictsFound: number;
+  conflictsResolved: number;
+  errors: string[];
+}
+
+export interface SyncConflictField {
+  field: string;
+  label: string;
+  entity: string;
+  /** @nullable */
+  currentValue?: string | null;
+  sheetValue: string;
+  /** @nullable */
+  lastSyncedValue?: string | null;
+}
+
+export interface SyncConflict {
+  rowIndex: number;
+  campaignName: string;
+  projectId: number;
+  /** @nullable */
+  clientId?: number | null;
+  isFirstSync: boolean;
+  fields: SyncConflictField[];
+}
+
+export interface SyncResult {
+  historyId: number;
+  summary: SyncSummary;
+  conflicts: SyncConflict[];
+}
+
+export interface SyncResolution {
+  projectId: number;
+  /** @nullable */
+  clientId?: number | null;
+  field: string;
+  accept: boolean;
+}
+
+export interface SyncConfirmRequest {
+  resolutions: SyncResolution[];
+}
+
+export type SyncHistoryItemSummary = { [key: string]: unknown };
+
+export type SyncHistoryItemErrors = { [key: string]: unknown };
+
+export type SyncHistoryItemPendingConflicts = { [key: string]: unknown };
+
+export interface SyncHistoryItem {
+  id: number;
+  connectionId: number;
+  status: string;
+  summary?: SyncHistoryItemSummary;
+  rowsProcessed: number;
+  errors?: SyncHistoryItemErrors;
+  pendingConflicts?: SyncHistoryItemPendingConflicts;
+  createdAt: string;
+  /** @nullable */
+  spreadsheetName?: string | null;
+}
+
 export type ListClientsParams = {
 /**
  * Search by company name or contact person
@@ -455,4 +569,18 @@ projectId?: number;
 export type DeleteDocument200 = {
   success: boolean;
 };
+
+export type DeleteSheetConnection200 = {
+  success: boolean;
+};
+
+export type ConfirmSyncResolutions200 = {
+  success: boolean;
+  summary: SyncSummary;
+};
+
+export type GetTargetFields200 = {[key: string]: {
+  label: string;
+  entity: string;
+}};
 

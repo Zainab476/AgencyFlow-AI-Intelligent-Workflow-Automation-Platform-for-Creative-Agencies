@@ -11,7 +11,8 @@ import {
   Bell,
   Activity,
   FileText,
-  Sparkles
+  Sparkles,
+  Table2
 } from 'lucide-react';
 import { useAuth } from '@/contexts/useAuth';
 import { useGetMe, useListNotifications } from '@workspace/api-client-react';
@@ -41,6 +42,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     { name: 'Projects', href: '/projects', icon: FolderKanban },
     { name: 'Tasks', href: '/tasks', icon: CheckSquare },
     { name: 'Documents', href: '/documents', icon: FileText },
+    { name: 'Sheets', href: '/sheets', icon: Table2 },
     { name: 'Notifications', href: '/notifications', icon: Bell },
     { name: 'Activity', href: '/activity', icon: Activity },
   ];

@@ -26,13 +26,16 @@ import type {
   Client,
   ClientInput,
   ClientUpdate,
+  ConfirmSyncResolutions200,
   DashboardStats,
   DeleteDocument200,
+  DeleteSheetConnection200,
   ErrorResponse,
   FileUpload,
   GenerateDocumentRequest,
   GeneratedDocument,
   GetRecentProjectsParams,
+  GetTargetFields200,
   HealthStatus,
   ListActivityParams,
   ListClientsParams,
@@ -51,7 +54,15 @@ import type {
   ProjectMemberUpdate,
   ProjectUpdate,
   RegisterInput,
+  SheetConnection,
+  SheetConnectionCreate,
+  SheetConnectionUpdate,
+  SheetHeadersResponse,
+  SheetPreviewResponse,
   SuccessResponse,
+  SyncConfirmRequest,
+  SyncHistoryItem,
+  SyncResult,
   Task,
   TaskInput,
   TaskStatusPatch,
@@ -3025,4 +3036,746 @@ export const useDeleteDocument = <TError = ErrorType<ErrorResponse>,
       > => {
       return useMutation(getDeleteDocumentMutationOptions(options));
     }
+
+export const getListSheetConnectionsUrl = () => {
+
+
+
+
+  return `/api/sheets/connections`
+}
+
+/**
+ * @summary List connected spreadsheets
+ */
+export const listSheetConnections = async ( options?: RequestInit): Promise<SheetConnection[]> => {
+
+  return customFetch<SheetConnection[]>(getListSheetConnectionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListSheetConnectionsQueryKey = () => {
+    return [
+    `/api/sheets/connections`
+    ] as const;
+    }
+
+
+export const getListSheetConnectionsQueryOptions = <TData = Awaited<ReturnType<typeof listSheetConnections>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSheetConnections>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSheetConnectionsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSheetConnections>>> = ({ signal }) => listSheetConnections({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSheetConnections>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListSheetConnectionsQueryResult = NonNullable<Awaited<ReturnType<typeof listSheetConnections>>>
+export type ListSheetConnectionsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List connected spreadsheets
+ */
+
+export function useListSheetConnections<TData = Awaited<ReturnType<typeof listSheetConnections>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSheetConnections>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListSheetConnectionsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateSheetConnectionUrl = () => {
+
+
+
+
+  return `/api/sheets/connections`
+}
+
+/**
+ * @summary Connect a Google Spreadsheet
+ */
+export const createSheetConnection = async (sheetConnectionCreate: SheetConnectionCreate, options?: RequestInit): Promise<SheetConnection> => {
+
+  return customFetch<SheetConnection>(getCreateSheetConnectionUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(sheetConnectionCreate)
+  }
+);}
+
+
+
+
+
+export const getCreateSheetConnectionMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSheetConnection>>, TError,{data: BodyType<SheetConnectionCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSheetConnection>>, TError,{data: BodyType<SheetConnectionCreate>}, TContext> => {
+
+const mutationKey = ['createSheetConnection'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSheetConnection>>, {data: BodyType<SheetConnectionCreate>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createSheetConnection(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSheetConnectionMutationResult = NonNullable<Awaited<ReturnType<typeof createSheetConnection>>>
+    export type CreateSheetConnectionMutationBody = BodyType<SheetConnectionCreate>
+    export type CreateSheetConnectionMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Connect a Google Spreadsheet
+ */
+export const useCreateSheetConnection = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSheetConnection>>, TError,{data: BodyType<SheetConnectionCreate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createSheetConnection>>,
+        TError,
+        {data: BodyType<SheetConnectionCreate>},
+        TContext
+      > => {
+      return useMutation(getCreateSheetConnectionMutationOptions(options));
+    }
+
+export const getUpdateSheetConnectionUrl = (id: number,) => {
+
+
+
+
+  return `/api/sheets/connections/${id}`
+}
+
+/**
+ * @summary Update column mapping or tab name
+ */
+export const updateSheetConnection = async (id: number,
+    sheetConnectionUpdate: SheetConnectionUpdate, options?: RequestInit): Promise<SheetConnection> => {
+
+  return customFetch<SheetConnection>(getUpdateSheetConnectionUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(sheetConnectionUpdate)
+  }
+);}
+
+
+
+
+
+export const getUpdateSheetConnectionMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSheetConnection>>, TError,{id: number;data: BodyType<SheetConnectionUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSheetConnection>>, TError,{id: number;data: BodyType<SheetConnectionUpdate>}, TContext> => {
+
+const mutationKey = ['updateSheetConnection'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSheetConnection>>, {id: number;data: BodyType<SheetConnectionUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateSheetConnection(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSheetConnectionMutationResult = NonNullable<Awaited<ReturnType<typeof updateSheetConnection>>>
+    export type UpdateSheetConnectionMutationBody = BodyType<SheetConnectionUpdate>
+    export type UpdateSheetConnectionMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update column mapping or tab name
+ */
+export const useUpdateSheetConnection = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSheetConnection>>, TError,{id: number;data: BodyType<SheetConnectionUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateSheetConnection>>,
+        TError,
+        {id: number;data: BodyType<SheetConnectionUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateSheetConnectionMutationOptions(options));
+    }
+
+export const getDeleteSheetConnectionUrl = (id: number,) => {
+
+
+
+
+  return `/api/sheets/connections/${id}`
+}
+
+/**
+ * @summary Remove a spreadsheet connection
+ */
+export const deleteSheetConnection = async (id: number, options?: RequestInit): Promise<DeleteSheetConnection200> => {
+
+  return customFetch<DeleteSheetConnection200>(getDeleteSheetConnectionUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteSheetConnectionMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSheetConnection>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteSheetConnection>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteSheetConnection'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSheetConnection>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteSheetConnection(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteSheetConnectionMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSheetConnection>>>
+
+    export type DeleteSheetConnectionMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Remove a spreadsheet connection
+ */
+export const useDeleteSheetConnection = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSheetConnection>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteSheetConnection>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteSheetConnectionMutationOptions(options));
+    }
+
+export const getGetSheetHeadersUrl = (id: number,) => {
+
+
+
+
+  return `/api/sheets/connections/${id}/headers`
+}
+
+/**
+ * @summary Get sheet column headers for mapping
+ */
+export const getSheetHeaders = async (id: number, options?: RequestInit): Promise<SheetHeadersResponse> => {
+
+  return customFetch<SheetHeadersResponse>(getGetSheetHeadersUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSheetHeadersQueryKey = (id: number,) => {
+    return [
+    `/api/sheets/connections/${id}/headers`
+    ] as const;
+    }
+
+
+export const getGetSheetHeadersQueryOptions = <TData = Awaited<ReturnType<typeof getSheetHeaders>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSheetHeaders>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSheetHeadersQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSheetHeaders>>> = ({ signal }) => getSheetHeaders(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSheetHeaders>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSheetHeadersQueryResult = NonNullable<Awaited<ReturnType<typeof getSheetHeaders>>>
+export type GetSheetHeadersQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get sheet column headers for mapping
+ */
+
+export function useGetSheetHeaders<TData = Awaited<ReturnType<typeof getSheetHeaders>>, TError = ErrorType<ErrorResponse>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSheetHeaders>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSheetHeadersQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getPreviewSheetRowsUrl = (id: number,) => {
+
+
+
+
+  return `/api/sheets/connections/${id}/preview`
+}
+
+/**
+ * @summary Preview first 10 rows of a spreadsheet
+ */
+export const previewSheetRows = async (id: number, options?: RequestInit): Promise<SheetPreviewResponse> => {
+
+  return customFetch<SheetPreviewResponse>(getPreviewSheetRowsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getPreviewSheetRowsQueryKey = (id: number,) => {
+    return [
+    `/api/sheets/connections/${id}/preview`
+    ] as const;
+    }
+
+
+export const getPreviewSheetRowsQueryOptions = <TData = Awaited<ReturnType<typeof previewSheetRows>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof previewSheetRows>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPreviewSheetRowsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof previewSheetRows>>> = ({ signal }) => previewSheetRows(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof previewSheetRows>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type PreviewSheetRowsQueryResult = NonNullable<Awaited<ReturnType<typeof previewSheetRows>>>
+export type PreviewSheetRowsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Preview first 10 rows of a spreadsheet
+ */
+
+export function usePreviewSheetRows<TData = Awaited<ReturnType<typeof previewSheetRows>>, TError = ErrorType<ErrorResponse>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof previewSheetRows>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getPreviewSheetRowsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSyncSheetUrl = (id: number,) => {
+
+
+
+
+  return `/api/sheets/connections/${id}/sync`
+}
+
+/**
+ * @summary Run a sync from the spreadsheet
+ */
+export const syncSheet = async (id: number, options?: RequestInit): Promise<SyncResult> => {
+
+  return customFetch<SyncResult>(getSyncSheetUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getSyncSheetMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof syncSheet>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof syncSheet>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['syncSheet'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof syncSheet>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  syncSheet(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SyncSheetMutationResult = NonNullable<Awaited<ReturnType<typeof syncSheet>>>
+
+    export type SyncSheetMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Run a sync from the spreadsheet
+ */
+export const useSyncSheet = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof syncSheet>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof syncSheet>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getSyncSheetMutationOptions(options));
+    }
+
+export const getListSyncHistoryUrl = () => {
+
+
+
+
+  return `/api/sheets/history`
+}
+
+/**
+ * @summary List sync history records
+ */
+export const listSyncHistory = async ( options?: RequestInit): Promise<SyncHistoryItem[]> => {
+
+  return customFetch<SyncHistoryItem[]>(getListSyncHistoryUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListSyncHistoryQueryKey = () => {
+    return [
+    `/api/sheets/history`
+    ] as const;
+    }
+
+
+export const getListSyncHistoryQueryOptions = <TData = Awaited<ReturnType<typeof listSyncHistory>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSyncHistory>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSyncHistoryQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSyncHistory>>> = ({ signal }) => listSyncHistory({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSyncHistory>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListSyncHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof listSyncHistory>>>
+export type ListSyncHistoryQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List sync history records
+ */
+
+export function useListSyncHistory<TData = Awaited<ReturnType<typeof listSyncHistory>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSyncHistory>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListSyncHistoryQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getConfirmSyncResolutionsUrl = (historyId: number,) => {
+
+
+
+
+  return `/api/sheets/history/${historyId}/confirm`
+}
+
+/**
+ * @summary Resolve sync conflicts
+ */
+export const confirmSyncResolutions = async (historyId: number,
+    syncConfirmRequest: SyncConfirmRequest, options?: RequestInit): Promise<ConfirmSyncResolutions200> => {
+
+  return customFetch<ConfirmSyncResolutions200>(getConfirmSyncResolutionsUrl(historyId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(syncConfirmRequest)
+  }
+);}
+
+
+
+
+
+export const getConfirmSyncResolutionsMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmSyncResolutions>>, TError,{historyId: number;data: BodyType<SyncConfirmRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof confirmSyncResolutions>>, TError,{historyId: number;data: BodyType<SyncConfirmRequest>}, TContext> => {
+
+const mutationKey = ['confirmSyncResolutions'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirmSyncResolutions>>, {historyId: number;data: BodyType<SyncConfirmRequest>}> = (props) => {
+          const {historyId,data} = props ?? {};
+
+          return  confirmSyncResolutions(historyId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmSyncResolutionsMutationResult = NonNullable<Awaited<ReturnType<typeof confirmSyncResolutions>>>
+    export type ConfirmSyncResolutionsMutationBody = BodyType<SyncConfirmRequest>
+    export type ConfirmSyncResolutionsMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Resolve sync conflicts
+ */
+export const useConfirmSyncResolutions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmSyncResolutions>>, TError,{historyId: number;data: BodyType<SyncConfirmRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof confirmSyncResolutions>>,
+        TError,
+        {historyId: number;data: BodyType<SyncConfirmRequest>},
+        TContext
+      > => {
+      return useMutation(getConfirmSyncResolutionsMutationOptions(options));
+    }
+
+export const getGetTargetFieldsUrl = () => {
+
+
+
+
+  return `/api/sheets/target-fields`
+}
+
+/**
+ * @summary Get available sync target fields
+ */
+export const getTargetFields = async ( options?: RequestInit): Promise<GetTargetFields200> => {
+
+  return customFetch<GetTargetFields200>(getGetTargetFieldsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTargetFieldsQueryKey = () => {
+    return [
+    `/api/sheets/target-fields`
+    ] as const;
+    }
+
+
+export const getGetTargetFieldsQueryOptions = <TData = Awaited<ReturnType<typeof getTargetFields>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTargetFields>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTargetFieldsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTargetFields>>> = ({ signal }) => getTargetFields({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTargetFields>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTargetFieldsQueryResult = NonNullable<Awaited<ReturnType<typeof getTargetFields>>>
+export type GetTargetFieldsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get available sync target fields
+ */
+
+export function useGetTargetFields<TData = Awaited<ReturnType<typeof getTargetFields>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTargetFields>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTargetFieldsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 
