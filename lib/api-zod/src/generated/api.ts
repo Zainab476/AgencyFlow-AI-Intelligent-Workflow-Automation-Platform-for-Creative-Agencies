@@ -191,6 +191,7 @@ export const ListProjectsResponseItem = zod.object({
   "startDate": zod.string().nullish(),
   "endDate": zod.string().nullish(),
   "status": zod.enum(['planning', 'active', 'on_hold', 'completed', 'cancelled']),
+  "campaignType": zod.union([zod.enum(['social_media', 'branding', 'content_marketing', 'advertising', 'web_design', 'pr', 'video_production', 'other']),zod.null()]).optional(),
   "createdAt": zod.string()
 })
 export const ListProjectsResponse = zod.array(ListProjectsResponseItem)
@@ -208,7 +209,8 @@ export const CreateProjectBody = zod.object({
   "budget": zod.number().optional(),
   "startDate": zod.string().optional(),
   "endDate": zod.string().optional(),
-  "status": zod.enum(['planning', 'active', 'on_hold', 'completed', 'cancelled']).optional()
+  "status": zod.enum(['planning', 'active', 'on_hold', 'completed', 'cancelled']).optional(),
+  "campaignType": zod.enum(['social_media', 'branding', 'content_marketing', 'advertising', 'web_design', 'pr', 'video_production', 'other']).optional()
 })
 
 export const CreateProjectResponse = zod.object({
@@ -220,6 +222,7 @@ export const CreateProjectResponse = zod.object({
   "startDate": zod.string().nullish(),
   "endDate": zod.string().nullish(),
   "status": zod.enum(['planning', 'active', 'on_hold', 'completed', 'cancelled']),
+  "campaignType": zod.union([zod.enum(['social_media', 'branding', 'content_marketing', 'advertising', 'web_design', 'pr', 'video_production', 'other']),zod.null()]).optional(),
   "createdAt": zod.string()
 })
 
@@ -240,6 +243,7 @@ export const GetProjectResponse = zod.object({
   "startDate": zod.string().nullish(),
   "endDate": zod.string().nullish(),
   "status": zod.enum(['planning', 'active', 'on_hold', 'completed', 'cancelled']),
+  "campaignType": zod.union([zod.enum(['social_media', 'branding', 'content_marketing', 'advertising', 'web_design', 'pr', 'video_production', 'other']),zod.null()]).optional(),
   "createdAt": zod.string()
 })
 
@@ -260,7 +264,8 @@ export const UpdateProjectBody = zod.object({
   "budget": zod.number().optional(),
   "startDate": zod.string().optional(),
   "endDate": zod.string().optional(),
-  "status": zod.enum(['planning', 'active', 'on_hold', 'completed', 'cancelled']).optional()
+  "status": zod.enum(['planning', 'active', 'on_hold', 'completed', 'cancelled']).optional(),
+  "campaignType": zod.enum(['social_media', 'branding', 'content_marketing', 'advertising', 'web_design', 'pr', 'video_production', 'other']).optional()
 })
 
 export const UpdateProjectResponse = zod.object({
@@ -272,6 +277,7 @@ export const UpdateProjectResponse = zod.object({
   "startDate": zod.string().nullish(),
   "endDate": zod.string().nullish(),
   "status": zod.enum(['planning', 'active', 'on_hold', 'completed', 'cancelled']),
+  "campaignType": zod.union([zod.enum(['social_media', 'branding', 'content_marketing', 'advertising', 'web_design', 'pr', 'video_production', 'other']),zod.null()]).optional(),
   "createdAt": zod.string()
 })
 
@@ -686,6 +692,7 @@ export const GetRecentProjectsResponseItem = zod.object({
   "startDate": zod.string().nullish(),
   "endDate": zod.string().nullish(),
   "status": zod.enum(['planning', 'active', 'on_hold', 'completed', 'cancelled']),
+  "campaignType": zod.union([zod.enum(['social_media', 'branding', 'content_marketing', 'advertising', 'web_design', 'pr', 'video_production', 'other']),zod.null()]).optional(),
   "createdAt": zod.string()
 })
 export const GetRecentProjectsResponse = zod.array(GetRecentProjectsResponseItem)
@@ -1212,5 +1219,63 @@ export const ListExecutionLogsResponseItem = zod.object({
   "createdAt": zod.string()
 })
 export const ListExecutionLogsResponse = zod.array(ListExecutionLogsResponseItem)
+
+
+/**
+ * @summary Get analytics overview data
+ */
+export const GetAnalyticsOverviewQueryParams = zod.object({
+  "period": zod.enum(['monthly', 'quarterly', 'yearly']).optional(),
+  "year": zod.coerce.number().optional()
+})
+
+export const GetAnalyticsOverviewResponse = zod.object({
+  "revenueByPeriod": zod.array(zod.object({
+  "label": zod.string(),
+  "revenue": zod.number().optional(),
+  "created": zod.number().optional(),
+  "completed": zod.number().optional(),
+  "rate": zod.number().optional(),
+  "clients": zod.number().optional()
+})),
+  "projectsByPeriod": zod.array(zod.object({
+  "label": zod.string(),
+  "revenue": zod.number().optional(),
+  "created": zod.number().optional(),
+  "completed": zod.number().optional(),
+  "rate": zod.number().optional(),
+  "clients": zod.number().optional()
+})),
+  "completionRateByPeriod": zod.array(zod.object({
+  "label": zod.string(),
+  "revenue": zod.number().optional(),
+  "created": zod.number().optional(),
+  "completed": zod.number().optional(),
+  "rate": zod.number().optional(),
+  "clients": zod.number().optional()
+})),
+  "clientsByPeriod": zod.array(zod.object({
+  "label": zod.string(),
+  "revenue": zod.number().optional(),
+  "created": zod.number().optional(),
+  "completed": zod.number().optional(),
+  "rate": zod.number().optional(),
+  "clients": zod.number().optional()
+})),
+  "taskStatusBreakdown": zod.array(zod.object({
+  "status": zod.string(),
+  "count": zod.number()
+})),
+  "campaignTypeBreakdown": zod.array(zod.object({
+  "type": zod.string(),
+  "count": zod.number()
+})),
+  "summary": zod.object({
+  "totalRevenue": zod.number(),
+  "totalProjects": zod.number(),
+  "avgCompletionRate": zod.number(),
+  "totalClients": zod.number()
+})
+})
 
 

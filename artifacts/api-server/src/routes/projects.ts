@@ -20,6 +20,7 @@ function formatProject(p: typeof projectsTable.$inferSelect, clientName?: string
     startDate: p.startDate ?? null,
     endDate: p.endDate ?? null,
     status: p.status,
+    campaignType: p.campaignType ?? null,
     createdAt: p.createdAt.toISOString(),
   };
 }
@@ -58,7 +59,7 @@ router.post("/", async (req, res) => {
     return;
   }
 
-  const { clientId, campaignName, budget, startDate, endDate, status } = parsed.data;
+  const { clientId, campaignName, budget, startDate, endDate, status, campaignType } = parsed.data;
 
   // Verify client belongs to user
   const [client] = await db
@@ -82,6 +83,7 @@ router.post("/", async (req, res) => {
       startDate: startDate ?? null,
       endDate: endDate ?? null,
       status: status ?? "planning",
+      campaignType: campaignType ?? null,
     })
     .returning();
 

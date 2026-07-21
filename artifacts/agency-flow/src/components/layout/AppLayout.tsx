@@ -14,6 +14,7 @@ import {
   Sparkles,
   Table2,
   Webhook,
+  BarChart3,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/useAuth';
 import { useGetMe, useListNotifications } from '@workspace/api-client-react';
@@ -39,6 +40,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Analytics', href: '/analytics', icon: BarChart3 },
     { name: 'Clients', href: '/clients', icon: Users },
     { name: 'Projects', href: '/projects', icon: FolderKanban },
     { name: 'Tasks', href: '/tasks', icon: CheckSquare },

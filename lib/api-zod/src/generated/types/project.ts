@@ -5,6 +5,7 @@
  * AgencyFlow AI API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { CampaignType } from './campaignType';
 import type { ProjectStatus } from './projectStatus';
 
 export interface Project {
@@ -20,5 +21,6 @@ export interface Project {
   /** @nullable */
   endDate?: string | null;
   status: ProjectStatus;
+  campaignType?: CampaignType | null;
   createdAt: string;
 }

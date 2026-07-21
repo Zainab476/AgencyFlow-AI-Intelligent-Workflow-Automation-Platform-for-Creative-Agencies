@@ -13,6 +13,7 @@ import aiRouter from "./ai";
 import documentsRouter from "./documents";
 import sheetsRouter from "./sheets";
 import webhooksRouter from "./webhooks";
+import analyticsRouter from "./analytics";
 
 const router = Router();
 
@@ -30,5 +31,6 @@ router.use("/ai", aiRouter);
 router.use("/documents", documentsRouter);
 router.use("/sheets", sheetsRouter);
 router.use("/webhooks", webhooksRouter);
+router.use("/analytics", analyticsRouter);
 
 export default router;

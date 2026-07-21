@@ -20,6 +20,17 @@ export const projectStatusEnum = pgEnum("project_status", [
   "cancelled",
 ]);
 
+export const campaignTypeEnum = pgEnum("campaign_type", [
+  "social_media",
+  "branding",
+  "content_marketing",
+  "advertising",
+  "web_design",
+  "pr",
+  "video_production",
+  "other",
+]);
+
 export const projectsTable = pgTable("projects", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
@@ -33,6 +44,7 @@ export const projectsTable = pgTable("projects", {
   startDate: text("start_date"),
   endDate: text("end_date"),
   status: projectStatusEnum("status").default("planning").notNull(),
+  campaignType: campaignTypeEnum("campaign_type"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 

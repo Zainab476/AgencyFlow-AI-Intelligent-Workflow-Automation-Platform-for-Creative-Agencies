@@ -34,6 +34,8 @@ tags:
     description: Document generation
   - name: sheets
     description: Google Sheets sync
+  - name: analytics
+    description: Analytics and reporting
 
 paths:
   /healthz:
@@ -1976,6 +1978,37 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /analytics/overview:
+    get:
+      operationId: getAnalyticsOverview
+      tags: [analytics]
+      summary: Get analytics overview data
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: period
+          in: query
+          schema:
+            type: string
+            enum: [monthly, quarterly, yearly]
+        - name: year
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Analytics overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsOverview"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -2147,6 +2180,10 @@ components:
           type: ["string", "null"]
         status:
           $ref: "#/components/schemas/ProjectStatus"
+        campaignType:
+          oneOf:
+            - $ref: "#/components/schemas/CampaignType"
+            - type: "null"
         createdAt:
           type: string
       required:
@@ -2155,6 +2192,18 @@ components:
         - campaignName
         - status
         - createdAt
+
+    CampaignType:
+      type: string
+      enum:
+        - social_media
+        - branding
+        - content_marketing
+        - advertising
+        - web_design
+        - pr
+        - video_production
+        - other
 
     ProjectInput:
       type: object
@@ -2172,6 +2221,8 @@ components:
           type: string
         status:
           $ref: "#/components/schemas/ProjectStatus"
+        campaignType:
+          $ref: "#/components/schemas/CampaignType"
       required:
         - clientId
         - campaignName
@@ -2192,6 +2243,8 @@ components:
           type: string
         status:
           $ref: "#/components/schemas/ProjectStatus"
+        campaignType:
+          $ref: "#/components/schemas/CampaignType"
 
     # ── Team Member schemas ──────────────────────────────────────────
     MemberRole:
@@ -2929,3 +2982,90 @@ components:
     AnyRecord:
       type: object
       additionalProperties: true
+
+    # ── Analytics schemas ────────────────────────────────────────────
+    PeriodDataPoint:
+      type: object
+      properties:
+        label:
+          type: string
+        revenue:
+          type: number
+        created:
+          type: integer
+        completed:
+          type: integer
+        rate:
+          type: integer
+        clients:
+          type: integer
+      required: [label]
+
+    TaskStatusCount:
+      type: object
+      properties:
+        status:
+          type: string
+        count:
+          type: integer
+      required: [status, count]
+
+    CampaignTypeCount:
+      type: object
+      properties:
+        type:
+          type: string
+        count:
+          type: integer
+      required: [type, count]
+
+    AnalyticsSummary:
+      type: object
+      properties:
+        totalRevenue:
+          type: number
+        totalProjects:
+          type: integer
+        avgCompletionRate:
+          type: integer
+        totalClients:
+          type: integer
+      required: [totalRevenue, totalProjects, avgCompletionRate, totalClients]
+
+    AnalyticsOverview:
+      type: object
+      properties:
+        revenueByPeriod:
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodDataPoint"
+        projectsByPeriod:
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodDataPoint"
+        completionRateByPeriod:
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodDataPoint"
+        clientsByPeriod:
+          type: array
+          items:
+            $ref: "#/components/schemas/PeriodDataPoint"
+        taskStatusBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskStatusCount"
+        campaignTypeBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/CampaignTypeCount"
+        summary:
+          $ref: "#/components/schemas/AnalyticsSummary"
+      required:
+        - revenueByPeriod
+        - projectsByPeriod
+        - completionRateByPeriod
+        - clientsByPeriod
+        - taskStatusBreakdown
+        - campaignTypeBreakdown
+        - summary

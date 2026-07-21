@@ -82,6 +82,20 @@ export const ProjectStatus = {
   cancelled: 'cancelled',
 } as const;
 
+export type CampaignType = typeof CampaignType[keyof typeof CampaignType];
+
+
+export const CampaignType = {
+  social_media: 'social_media',
+  branding: 'branding',
+  content_marketing: 'content_marketing',
+  advertising: 'advertising',
+  web_design: 'web_design',
+  pr: 'pr',
+  video_production: 'video_production',
+  other: 'other',
+} as const;
+
 export interface Project {
   id: number;
   clientId: number;
@@ -95,6 +109,7 @@ export interface Project {
   /** @nullable */
   endDate?: string | null;
   status: ProjectStatus;
+  campaignType?: CampaignType | null;
   createdAt: string;
 }
 
@@ -106,6 +121,7 @@ export interface ProjectInput {
   startDate?: string;
   endDate?: string;
   status?: ProjectStatus;
+  campaignType?: CampaignType;
 }
 
 export interface ProjectUpdate {
@@ -116,6 +132,7 @@ export interface ProjectUpdate {
   startDate?: string;
   endDate?: string;
   status?: ProjectStatus;
+  campaignType?: CampaignType;
 }
 
 export type MemberRole = typeof MemberRole[keyof typeof MemberRole];
@@ -572,6 +589,42 @@ export interface TriggerResult {
 
 export interface AnyRecord { [key: string]: unknown }
 
+export interface PeriodDataPoint {
+  label: string;
+  revenue?: number;
+  created?: number;
+  completed?: number;
+  rate?: number;
+  clients?: number;
+}
+
+export interface TaskStatusCount {
+  status: string;
+  count: number;
+}
+
+export interface CampaignTypeCount {
+  type: string;
+  count: number;
+}
+
+export interface AnalyticsSummary {
+  totalRevenue: number;
+  totalProjects: number;
+  avgCompletionRate: number;
+  totalClients: number;
+}
+
+export interface AnalyticsOverview {
+  revenueByPeriod: PeriodDataPoint[];
+  projectsByPeriod: PeriodDataPoint[];
+  completionRateByPeriod: PeriodDataPoint[];
+  clientsByPeriod: PeriodDataPoint[];
+  taskStatusBreakdown: TaskStatusCount[];
+  campaignTypeBreakdown: CampaignTypeCount[];
+  summary: AnalyticsSummary;
+}
+
 export type ListClientsParams = {
 /**
  * Search by company name or contact person
@@ -704,5 +757,19 @@ export const ListExecutionLogsStatus = {
   success: 'success',
   error: 'error',
   pending: 'pending',
+} as const;
+
+export type GetAnalyticsOverviewParams = {
+period?: GetAnalyticsOverviewPeriod;
+year?: number;
+};
+
+export type GetAnalyticsOverviewPeriod = typeof GetAnalyticsOverviewPeriod[keyof typeof GetAnalyticsOverviewPeriod];
+
+
+export const GetAnalyticsOverviewPeriod = {
+  monthly: 'monthly',
+  quarterly: 'quarterly',
+  yearly: 'yearly',
 } as const;
 
