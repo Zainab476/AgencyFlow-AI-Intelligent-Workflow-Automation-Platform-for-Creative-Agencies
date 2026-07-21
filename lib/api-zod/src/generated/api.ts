@@ -992,3 +992,225 @@ export const GetTargetFieldsResponse = zod.record(zod.string(), zod.object({
 }))
 
 
+/**
+ * @summary Inbound action endpoint for n8n (token-authenticated)
+ */
+export const InboundWebhookActionParams = zod.object({
+  "token": zod.coerce.string(),
+  "action": zod.enum(['analyze', 'generate-document', 'notify', 'send-email'])
+})
+
+export const InboundWebhookActionBody = zod.record(zod.string(), zod.unknown())
+
+export const InboundWebhookActionResponse = zod.record(zod.string(), zod.unknown())
+
+
+/**
+ * @summary List webhook configurations
+ */
+export const ListWebhookConfigsResponseItem = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "url": zod.string(),
+  "secret": zod.string(),
+  "eventTypes": zod.array(zod.string()),
+  "active": zod.boolean(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const ListWebhookConfigsResponse = zod.array(ListWebhookConfigsResponseItem)
+
+
+/**
+ * @summary Create a webhook configuration
+ */
+export const CreateWebhookConfigBody = zod.object({
+  "name": zod.string(),
+  "url": zod.string(),
+  "secret": zod.string().optional(),
+  "eventTypes": zod.array(zod.string()),
+  "active": zod.boolean().optional()
+})
+
+export const CreateWebhookConfigResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "url": zod.string(),
+  "secret": zod.string(),
+  "eventTypes": zod.array(zod.string()),
+  "active": zod.boolean(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Get a webhook config
+ */
+export const GetWebhookConfigParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetWebhookConfigResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "url": zod.string(),
+  "secret": zod.string(),
+  "eventTypes": zod.array(zod.string()),
+  "active": zod.boolean(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update a webhook config
+ */
+export const UpdateWebhookConfigParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateWebhookConfigBody = zod.object({
+  "name": zod.string().optional(),
+  "url": zod.string().optional(),
+  "secret": zod.string().optional(),
+  "eventTypes": zod.array(zod.string()).optional(),
+  "active": zod.boolean().optional()
+})
+
+export const UpdateWebhookConfigResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "url": zod.string(),
+  "secret": zod.string(),
+  "eventTypes": zod.array(zod.string()),
+  "active": zod.boolean(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a webhook config
+ */
+export const DeleteWebhookConfigParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteWebhookConfigResponse = zod.object({
+  "success": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary Manually trigger a webhook
+ */
+export const TriggerWebhookConfigParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const TriggerWebhookConfigBody = zod.record(zod.string(), zod.unknown())
+
+export const TriggerWebhookConfigResponse = zod.object({
+  "success": zod.boolean(),
+  "status": zod.string(),
+  "durationMs": zod.number().optional(),
+  "error": zod.string().nullish(),
+  "response": zod.unknown().nullish()
+})
+
+
+/**
+ * @summary List inbound webhook tokens
+ */
+export const ListInboundTokensResponseItem = zod.object({
+  "id": zod.number(),
+  "webhookConfigId": zod.number().nullish(),
+  "token": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "revokedAt": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+export const ListInboundTokensResponse = zod.array(ListInboundTokensResponseItem)
+
+
+/**
+ * @summary Create an inbound webhook token
+ */
+export const CreateInboundTokenBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "webhookConfigId": zod.number().optional()
+})
+
+export const CreateInboundTokenResponse = zod.object({
+  "id": zod.number(),
+  "webhookConfigId": zod.number().nullish(),
+  "token": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "revokedAt": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Revoke an inbound webhook token
+ */
+export const RevokeInboundTokenParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RevokeInboundTokenResponse = zod.object({
+  "success": zod.boolean(),
+  "message": zod.string().optional()
+})
+
+
+/**
+ * @summary Revoke and rotate an inbound webhook token
+ */
+export const RotateInboundTokenParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RotateInboundTokenResponse = zod.object({
+  "id": zod.number(),
+  "webhookConfigId": zod.number().nullish(),
+  "token": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "revokedAt": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary List workflow execution logs
+ */
+export const ListExecutionLogsQueryParams = zod.object({
+  "direction": zod.enum(['inbound', 'outbound']).optional(),
+  "status": zod.enum(['success', 'error', 'pending']).optional(),
+  "dateFrom": zod.coerce.string().optional(),
+  "dateTo": zod.coerce.string().optional(),
+  "limit": zod.coerce.number().optional(),
+  "offset": zod.coerce.number().optional()
+})
+
+export const ListExecutionLogsResponseItem = zod.object({
+  "id": zod.number(),
+  "webhookConfigId": zod.number().nullish(),
+  "direction": zod.enum(['inbound', 'outbound']),
+  "eventOrAction": zod.string(),
+  "status": zod.enum(['success', 'error', 'pending']),
+  "requestBody": zod.record(zod.string(), zod.unknown()).nullish(),
+  "responseBody": zod.record(zod.string(), zod.unknown()).nullish(),
+  "durationMs": zod.number().nullish(),
+  "error": zod.string().nullish(),
+  "createdAt": zod.string()
+})
+export const ListExecutionLogsResponse = zod.array(ListExecutionLogsResponseItem)
+
+

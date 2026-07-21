@@ -8,6 +8,7 @@ import {
   UpdateTaskBody,
   UpdateTaskStatusBody,
 } from "@workspace/api-zod";
+import { emitWebhookEvent } from "../lib/webhooks/emitter";
 
 const router = Router();
 router.use(requireAuth);
@@ -112,6 +113,15 @@ router.post("/", async (req, res) => {
     description: `Task "${title}" created in ${project.campaignName}`,
   });
 
+  emitWebhookEvent(userId, "task.created", {
+    taskId: task!.id,
+    projectId,
+    title,
+    status: task!.status,
+    priority: task!.priority,
+    createdAt: task!.createdAt.toISOString(),
+  }).catch(() => {});
+
   res.status(201).json(fmt(task!, project.campaignName, memberName));
 });
 
@@ -189,6 +199,16 @@ router.put("/:id", async (req, res) => {
     });
   }
 
+  if (parsed.data.status && parsed.data.status !== existing.status) {
+    emitWebhookEvent(userId, "task.status_changed", {
+      taskId: id,
+      projectId: updated!.projectId,
+      title: updated!.title,
+      oldStatus: existing.status,
+      newStatus: updated!.status,
+    }).catch(() => {});
+  }
+
   res.json(fmt(updated!, projectRow?.name, memberName));
 });
 
@@ -226,10 +246,10 @@ router.patch("/:id/status", async (req, res) => {
     .where(and(eq(tasksTable.id, id), eq(tasksTable.userId, userId)))
     .returning();
 
-  if (wasCompleted) {
-    const [projectRow] = await db.select({ name: projectsTable.campaignName })
-      .from(projectsTable).where(eq(projectsTable.id, updated!.projectId)).limit(1);
+  const [projectRow] = await db.select({ name: projectsTable.campaignName })
+    .from(projectsTable).where(eq(projectsTable.id, updated!.projectId)).limit(1);
 
+  if (wasCompleted) {
     await logActivity({
       userId, projectId: updated!.projectId, taskId: id,
       action: "task_completed",
@@ -243,15 +263,21 @@ router.patch("/:id/status", async (req, res) => {
     });
   }
 
+  // Emit task.status_changed for any status transition
+  emitWebhookEvent(userId, "task.status_changed", {
+    taskId: id,
+    projectId: updated!.projectId,
+    title: updated!.title,
+    oldStatus: existing.status,
+    newStatus: updated!.status,
+  }).catch(() => {});
+
   let memberName: string | null = null;
   if (updated!.assignedMemberId) {
     const [m] = await db.select().from(projectMembersTable)
       .where(eq(projectMembersTable.id, updated!.assignedMemberId)).limit(1);
     memberName = m?.name ?? null;
   }
-
-  const [projectRow] = await db.select({ name: projectsTable.campaignName })
-    .from(projectsTable).where(eq(projectsTable.id, updated!.projectId)).limit(1);
 
   res.json(fmt(updated!, projectRow?.name, memberName));
 });

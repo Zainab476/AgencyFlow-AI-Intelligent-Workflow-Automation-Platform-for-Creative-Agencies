@@ -30,6 +30,9 @@ import {
   Presentation,
   Receipt,
   FileSpreadsheet,
+  Webhook,
+  ChevronDown,
+  Loader2,
 } from 'lucide-react';
 import { 
   useGetProject,
@@ -45,17 +48,21 @@ import {
   useListUploads,
   useDeleteUpload,
   useListDocuments,
+  useListWebhookConfigs,
+  useTriggerWebhookConfig,
   getListDocumentsQueryKey,
   getGetProjectQueryKey,
   getListProjectMembersQueryKey,
   getListTasksQueryKey,
   getListActivityQueryKey,
   getListUploadsQueryKey,
+  getListWebhookConfigsQueryKey,
   ProjectStatus,
   MemberRole,
   TaskStatus,
   TaskPriority,
   type DocumentType,
+  type WebhookConfig,
 } from '@workspace/api-client-react';
 import AIChatPanel from '@/components/ai/AIChatPanel';
 import ProjectAnalysisCard from '@/components/ai/ProjectAnalysis';
@@ -102,6 +109,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { ProjectStatusBadge } from '@/components/ProjectStatusBadge';
 
 const projectSchema = z.object({
@@ -175,6 +190,21 @@ export default function ProjectDetail({ id }: { id: string }) {
   const { data: uploads } = useListUploads({ projectId }, { query: { enabled: !!projectId, queryKey: getListUploadsQueryKey({ projectId }) } });
   const { data: activities } = useListActivity({ projectId }, { query: { enabled: !!projectId, queryKey: getListActivityQueryKey({ projectId }) } });
   const { data: projectDocs } = useListDocuments({ projectId }, { query: { enabled: !!projectId, queryKey: getListDocumentsQueryKey({ projectId }) } });
+  const { data: webhookConfigs = [] } = useListWebhookConfigs({ query: { queryKey: getListWebhookConfigsQueryKey() } });
+
+  const triggerMutation = useTriggerWebhookConfig({
+    mutation: {
+      onSuccess: (result, variables) => {
+        const cfg = webhookConfigs.find((c) => c.id === variables.id);
+        if (result.success) {
+          toast.success(`Workflow "${cfg?.name ?? 'Webhook'}" triggered successfully (${result.durationMs}ms)`);
+        } else {
+          toast.error(`Workflow trigger failed: ${result.error ?? 'Unknown error'}`);
+        }
+      },
+      onError: () => toast.error('Failed to trigger workflow'),
+    },
+  });
 
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
@@ -396,6 +426,43 @@ export default function ProjectDetail({ id }: { id: string }) {
             </>
           ) : (
             <>
+              {webhookConfigs.filter((c) => c.active).length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="gap-2" disabled={triggerMutation.isPending}>
+                      {triggerMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Webhook className="h-4 w-4" />
+                      )}
+                      Run Workflow
+                      <ChevronDown className="h-3.5 w-3.5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Select Workflow</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {webhookConfigs.filter((c) => c.active).map((config) => (
+                      <DropdownMenuItem
+                        key={config.id}
+                        onClick={() =>
+                          triggerMutation.mutate({
+                            id: config.id,
+                            data: {
+                              projectId,
+                              projectName: project?.campaignName,
+                              triggeredBy: 'manual',
+                            },
+                          })
+                        }
+                      >
+                        <Webhook className="h-3.5 w-3.5 mr-2 text-muted-foreground" />
+                        {config.name}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
               <Button variant="outline" onClick={() => setIsEditing(true)}>Edit Project</Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>

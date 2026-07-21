@@ -478,6 +478,100 @@ export interface SyncHistoryItem {
   spreadsheetName?: string | null;
 }
 
+export interface WebhookConfig {
+  id: number;
+  name: string;
+  url: string;
+  secret: string;
+  eventTypes: string[];
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WebhookConfigInput {
+  name: string;
+  url: string;
+  secret?: string;
+  eventTypes: string[];
+  active?: boolean;
+}
+
+export interface WebhookConfigUpdate {
+  name?: string;
+  url?: string;
+  secret?: string;
+  eventTypes?: string[];
+  active?: boolean;
+}
+
+export interface InboundToken {
+  id: number;
+  /** @nullable */
+  webhookConfigId?: number | null;
+  token: string;
+  name: string;
+  /** @nullable */
+  description?: string | null;
+  /** @nullable */
+  revokedAt?: string | null;
+  createdAt: string;
+}
+
+export interface InboundTokenInput {
+  name: string;
+  description?: string;
+  webhookConfigId?: number;
+}
+
+export type ExecutionLogDirection = typeof ExecutionLogDirection[keyof typeof ExecutionLogDirection];
+
+
+export const ExecutionLogDirection = {
+  inbound: 'inbound',
+  outbound: 'outbound',
+} as const;
+
+export type ExecutionLogStatus = typeof ExecutionLogStatus[keyof typeof ExecutionLogStatus];
+
+
+export const ExecutionLogStatus = {
+  success: 'success',
+  error: 'error',
+  pending: 'pending',
+} as const;
+
+export type ExecutionLogRequestBody = { [key: string]: unknown } | null;
+
+export type ExecutionLogResponseBody = { [key: string]: unknown } | null;
+
+export interface ExecutionLog {
+  id: number;
+  /** @nullable */
+  webhookConfigId?: number | null;
+  direction: ExecutionLogDirection;
+  eventOrAction: string;
+  status: ExecutionLogStatus;
+  requestBody?: ExecutionLogRequestBody;
+  responseBody?: ExecutionLogResponseBody;
+  /** @nullable */
+  durationMs?: number | null;
+  /** @nullable */
+  error?: string | null;
+  createdAt: string;
+}
+
+export interface TriggerResult {
+  success: boolean;
+  status: string;
+  durationMs?: number;
+  /** @nullable */
+  error?: string | null;
+  response?: unknown | null;
+}
+
+export interface AnyRecord { [key: string]: unknown }
+
 export type ListClientsParams = {
 /**
  * Search by company name or contact person
@@ -583,4 +677,32 @@ export type GetTargetFields200 = {[key: string]: {
   label: string;
   entity: string;
 }};
+
+export type InboundWebhookAction200 = { [key: string]: unknown };
+
+export type ListExecutionLogsParams = {
+direction?: ListExecutionLogsDirection;
+status?: ListExecutionLogsStatus;
+dateFrom?: string;
+dateTo?: string;
+limit?: number;
+offset?: number;
+};
+
+export type ListExecutionLogsDirection = typeof ListExecutionLogsDirection[keyof typeof ListExecutionLogsDirection];
+
+
+export const ListExecutionLogsDirection = {
+  inbound: 'inbound',
+  outbound: 'outbound',
+} as const;
+
+export type ListExecutionLogsStatus = typeof ListExecutionLogsStatus[keyof typeof ListExecutionLogsStatus];
+
+
+export const ListExecutionLogsStatus = {
+  success: 'success',
+  error: 'error',
+  pending: 'pending',
+} as const;
 

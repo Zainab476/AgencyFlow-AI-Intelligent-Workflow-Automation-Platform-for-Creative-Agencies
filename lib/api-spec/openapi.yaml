@@ -1567,6 +1567,415 @@ paths:
                       type: string
                   required: [label, entity]
 
+  # ── Webhooks ──────────────────────────────────────────────────────
+  /webhooks/action/{token}/{action}:
+    post:
+      operationId: inboundWebhookAction
+      tags: [webhooks]
+      summary: Inbound action endpoint for n8n (token-authenticated)
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: action
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [analyze, generate-document, notify, send-email]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnyRecord"
+      responses:
+        "200":
+          description: Action result
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Invalid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /webhooks/configs:
+    get:
+      operationId: listWebhookConfigs
+      tags: [webhooks]
+      summary: List webhook configurations
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of webhook configs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WebhookConfig"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createWebhookConfig
+      tags: [webhooks]
+      summary: Create a webhook configuration
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookConfigInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookConfig"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /webhooks/configs/{id}:
+    get:
+      operationId: getWebhookConfig
+      tags: [webhooks]
+      summary: Get a webhook config
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookConfig"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateWebhookConfig
+      tags: [webhooks]
+      summary: Update a webhook config
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookConfigUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebhookConfig"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteWebhookConfig
+      tags: [webhooks]
+      summary: Delete a webhook config
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /webhooks/configs/{id}/trigger:
+    post:
+      operationId: triggerWebhookConfig
+      tags: [webhooks]
+      summary: Manually trigger a webhook
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnyRecord"
+      responses:
+        "200":
+          description: Trigger result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TriggerResult"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /webhooks/tokens:
+    get:
+      operationId: listInboundTokens
+      tags: [webhooks]
+      summary: List inbound webhook tokens
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: List of tokens
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InboundToken"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    post:
+      operationId: createInboundToken
+      tags: [webhooks]
+      summary: Create an inbound webhook token
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InboundTokenInput"
+      responses:
+        "201":
+          description: Created token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InboundToken"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /webhooks/tokens/{id}:
+    delete:
+      operationId: revokeInboundToken
+      tags: [webhooks]
+      summary: Revoke an inbound webhook token
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Revoked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /webhooks/tokens/{id}/rotate:
+    post:
+      operationId: rotateInboundToken
+      tags: [webhooks]
+      summary: Revoke and rotate an inbound webhook token
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: New token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InboundToken"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /webhooks/logs:
+    get:
+      operationId: listExecutionLogs
+      tags: [webhooks]
+      summary: List workflow execution logs
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: direction
+          in: query
+          schema:
+            type: string
+            enum: [inbound, outbound]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [success, error, pending]
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+        - name: offset
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Execution logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExecutionLog"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -2383,3 +2792,140 @@ components:
         spreadsheetName:
           type: ["string", "null"]
       required: [id, connectionId, status, rowsProcessed, createdAt]
+
+    # ── Webhook schemas ───────────────────────────────────────────────────────
+    WebhookConfig:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        url:
+          type: string
+        secret:
+          type: string
+        eventTypes:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, name, url, secret, eventTypes, active, createdAt, updatedAt]
+
+    WebhookConfigInput:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        secret:
+          type: string
+        eventTypes:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
+      required: [name, url, eventTypes]
+
+    WebhookConfigUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        secret:
+          type: string
+        eventTypes:
+          type: array
+          items:
+            type: string
+        active:
+          type: boolean
+
+    InboundToken:
+      type: object
+      properties:
+        id:
+          type: integer
+        webhookConfigId:
+          type: ["integer", "null"]
+        token:
+          type: string
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        revokedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required: [id, token, name, createdAt]
+
+    InboundTokenInput:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        webhookConfigId:
+          type: integer
+      required: [name]
+
+    ExecutionLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        webhookConfigId:
+          type: ["integer", "null"]
+        direction:
+          type: string
+          enum: [inbound, outbound]
+        eventOrAction:
+          type: string
+        status:
+          type: string
+          enum: [success, error, pending]
+        requestBody:
+          type: object
+          additionalProperties: true
+          nullable: true
+        responseBody:
+          type: object
+          additionalProperties: true
+          nullable: true
+        durationMs:
+          type: ["integer", "null"]
+        error:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+      required: [id, direction, eventOrAction, status, createdAt]
+
+    TriggerResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        status:
+          type: string
+        durationMs:
+          type: integer
+        error:
+          type: ["string", "null"]
+        response:
+          nullable: true
+      required: [success, status]
+
+    AnyRecord:
+      type: object
+      additionalProperties: true

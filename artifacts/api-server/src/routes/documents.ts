@@ -7,6 +7,7 @@ import { exportToPDF } from "../lib/documents/pdf";
 import { exportToDOCX } from "../lib/documents/docx";
 import { exportToPPTX } from "../lib/documents/pptx";
 import type { DocumentType } from "../lib/ai/generator";
+import { emitWebhookEvent } from "../lib/webhooks/emitter";
 
 const router = Router();
 router.use(requireAuth);
@@ -98,6 +99,14 @@ router.post("/generate", async (req, res) => {
     .insert(documentsTable)
     .values({ userId, projectId, type, title, content })
     .returning();
+
+  emitWebhookEvent(userId, "document.generated", {
+    documentId: saved!.id,
+    projectId,
+    type,
+    title,
+    generatedAt: saved!.createdAt.toISOString(),
+  }).catch(() => {});
 
   res.status(201).json(formatDoc(saved!, row.project.campaignName, row.clientName));
 });

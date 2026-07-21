@@ -8,3 +8,6 @@ export * from "./activity_logs";
 export * from "./file_uploads";
 export * from "./documents";
 export * from "./sheets";
+export * from "./webhook_configs";
+export * from "./workflow_execution_logs";
+export * from "./inbound_webhook_tokens";

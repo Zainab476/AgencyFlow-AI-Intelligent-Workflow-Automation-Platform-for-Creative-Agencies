@@ -4,6 +4,7 @@ import { eq, and, ilike, sql } from "drizzle-orm";
 import { requireAuth } from "../middlewares/auth";
 import { CreateProjectBody, UpdateProjectBody } from "@workspace/api-zod";
 import { logActivity } from "../lib/activity";
+import { emitWebhookEvent } from "../lib/webhooks/emitter";
 
 const router = Router();
 
@@ -91,6 +92,15 @@ router.post("/", async (req, res) => {
     description: `Campaign "${campaignName}" created`,
   });
 
+  // Fire outbound webhook (non-blocking)
+  emitWebhookEvent(userId, "project.created", {
+    projectId: project!.id,
+    campaignName,
+    clientId,
+    status: project!.status,
+    createdAt: project!.createdAt.toISOString(),
+  }).catch(() => {});
+
   res.status(201).json(formatProject(project!, client.companyName));
 });
 
@@ -171,6 +181,13 @@ router.put("/:id", async (req, res) => {
     action: "project_updated",
     description: `Campaign "${updated!.campaignName}" updated`,
   });
+
+  emitWebhookEvent(userId, "project.updated", {
+    projectId: id,
+    campaignName: updated!.campaignName,
+    status: updated!.status,
+    updatedAt: new Date().toISOString(),
+  }).catch(() => {});
 
   res.json(formatProject(updated!, clientRow?.companyName));
 });

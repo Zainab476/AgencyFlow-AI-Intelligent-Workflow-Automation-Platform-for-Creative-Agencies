@@ -12,7 +12,8 @@ import {
   Activity,
   FileText,
   Sparkles,
-  Table2
+  Table2,
+  Webhook,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/useAuth';
 import { useGetMe, useListNotifications } from '@workspace/api-client-react';
@@ -43,6 +44,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     { name: 'Tasks', href: '/tasks', icon: CheckSquare },
     { name: 'Documents', href: '/documents', icon: FileText },
     { name: 'Sheets', href: '/sheets', icon: Table2 },
+    { name: 'Workflows', href: '/workflows', icon: Webhook },
     { name: 'Notifications', href: '/notifications', icon: Bell },
     { name: 'Activity', href: '/activity', icon: Activity },
   ];
