@@ -51,10 +51,11 @@ export default function ConnectSheetDialog({ open, onOpenChange, onConnected }: 
   const updateMutation = useUpdateSheetConnection();
 
   const headersQuery = useGetSheetHeaders(connId ?? 0, {
-    query: { enabled: !!connId && step === 'mapping' },
+    // queryKey is overridden internally by the generated hook; provided here only to satisfy the strict UseQueryOptions type
+    query: { queryKey: ['getSheetHeaders', connId], enabled: !!connId && step === 'mapping' },
   });
   const previewQuery = usePreviewSheetRows(connId ?? 0, {
-    query: { enabled: !!connId && step === 'preview' },
+    query: { queryKey: ['previewSheetRows', connId], enabled: !!connId && step === 'preview' },
   });
 
   const reset = () => {

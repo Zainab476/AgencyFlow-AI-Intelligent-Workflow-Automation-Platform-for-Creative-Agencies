@@ -3,5 +3,7 @@
 - [Zod v3 codegen](zod-v3-codegen.md) — Orval targets Zod v3; never add format:email or multipart file fields to OpenAPI spec — both generate v4-only syntax.
 - [DB libs rebuild](db-libs-rebuild.md) — after any lib/db/src/schema change, run `pnpm run typecheck:libs` before leaf artifact typechecks.
 - [SidebarContent hook rule](sidebar-content-hook.md) — inner component functions defined as consts inside a parent component must be closed with `};` not just `);`.
+- [AuthContext Fast Refresh split](authcontext-fast-refresh.md) — context object must live in a plain .ts file separate from the provider component and hook to satisfy Vite Fast Refresh.
+- [Orval queryKey workaround](orval-querykey.md) — React Query v5 UseQueryOptions requires queryKey; pass a placeholder key in query options since the hook overrides it internally.
 - [Gemini model IDs](gemini-model-ids.md) — gemini-2.5-flash is deprecated for new API keys; use gemini-2.0-flash. Also: pdfkit→fontkit requires @swc/helpers installed in api-server.
 - [SSE streaming pattern](sse-streaming-pattern.md) — Orval can't generate SSE hooks; use raw fetch + ReadableStream reader, split on \n\n, parse data: lines as JSON.
