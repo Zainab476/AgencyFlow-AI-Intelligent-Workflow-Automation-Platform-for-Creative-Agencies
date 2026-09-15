@@ -1,10 +1,11 @@
 import { useGetMe } from '@workspace/api-client-react';
+import { Link } from 'wouter';
 import { useAuth } from '@/contexts/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Mail, CalendarDays, LogOut, KeyRound, ShieldCheck } from 'lucide-react';
+import { Mail, CalendarDays, LogOut, KeyRound, ShieldCheck, Settings as SettingsIcon } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function Profile() {
@@ -92,7 +93,7 @@ export default function Profile() {
                     <KeyRound className="h-4 w-4" />
                     Role
                   </p>
-                  <p className="font-medium text-foreground">Administrator</p>
+                  <p className="font-medium text-foreground capitalize">{user.role ?? 'employee'}</p>
                 </div>
               </div>
             </CardContent>
@@ -107,6 +108,11 @@ export default function Profile() {
                 If you need assistance with your account or have questions about using AgencyFlow, our support team is ready to help.
               </p>
               <Button variant="secondary" size="sm">Contact Support</Button>
+              <Link href="/settings">
+                <Button variant="outline" size="sm" className="ml-2">
+                  <SettingsIcon className="mr-2 h-4 w-4" />Manage Settings
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         </div>

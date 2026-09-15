@@ -32,10 +32,10 @@ router.post("/register", async (req, res) => {
 
   const [user] = await db
     .insert(usersTable)
-    .values({ name, email, passwordHash })
+    .values({ name, email, passwordHash, role: "employee" })
     .returning();
 
-  const token = signToken({ userId: user.id, email: user.email });
+  const token = signToken({ userId: user.id, email: user.email, role: user.role });
 
   res.status(201).json({
     token,
@@ -43,6 +43,7 @@ router.post("/register", async (req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role,
       createdAt: user.createdAt.toISOString(),
     },
   });
@@ -75,7 +76,7 @@ router.post("/login", async (req, res) => {
     return;
   }
 
-  const token = signToken({ userId: user.id, email: user.email });
+  const token = signToken({ userId: user.id, email: user.email, role: user.role });
 
   res.json({
     token,
@@ -83,6 +84,7 @@ router.post("/login", async (req, res) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role,
       createdAt: user.createdAt.toISOString(),
     },
   });
@@ -105,6 +107,7 @@ router.get("/me", requireAuth, async (req, res) => {
     id: user.id,
     name: user.name,
     email: user.email,
+    role: user.role,
     createdAt: user.createdAt.toISOString(),
   });
 });

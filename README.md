@@ -1,122 +1,229 @@
-# AgencyFlow AI: An Intelligent Workflow Automation Platform for Creative Agencies
+# AgencyFlow AI
 
-[![Tech Stack](https://img.shields.io/badge/Stack-React%20%7C%20TypeScript%20%7C%20Node.js%20%7C%20PostgreSQL-blue)](#tech-stack)
-[![AI Powered](https://img.shields.io/badge/AI-Google%20Gemini-orange)](#key-features)
-[![Automation](https://img.shields.io/badge/Automation-n8n-red)](#key-features)
+AgencyFlow AI is a TypeScript monorepo for an intelligent workflow automation platform for creative agencies. The product combines a React + Vite front end, an Express + Drizzle API, a shared database schema package, and an OpenAPI-generated client layer for internal tooling and UI workflows.
 
-AgencyFlow AI is a web-based workflow automation platform designed to solve administrative overhead for marketing and creative agencies. By acting as a centralized source of truth, it utilizes AI and workflow orchestration to transform raw project data into business-ready proposals, contracts, client presentations, and task timelines automatically.
+## Product Overview
 
----
+AgencyFlow AI centralizes client relationships, campaign planning, project operations, document generation, task execution, analytics, and workflow automation for agencies. It is designed around a single source of truth for project data and automates the translation from raw project details into polished client-facing materials.
 
-## 📌 Problem Statement
+Core product areas include:
 
-Creative advertising and marketing agencies heavily rely on spreadsheets (like Google Sheets) to manage project parameters, campaign timelines, budgets, and deliverables. 
+- Client and project lifecycle management.
+- Project team and membership management.
+- AI-assisted campaign analysis and content generation.
+- Document generation for proposals, contracts, and deliverables.
+- Google Sheets integration and n8n workflow hooks.
+- Notifications, activities, dashboards, and analytics for operations.
 
-However, translating spreadsheet data into professional client-facing assets (proposals, contracts, slides, and invoices) remains a manual, error-prone, and repetitive process[cite: 1, 2]. Small to medium-sized agencies waste hundreds of billable hours on administrative documentation rather than creative execution[cite: 1, 2].
-
-## 💡 Solution & Core Value
-
-**AgencyFlow AI** centralizes agency client and project data into a single operational hub[cite: 1, 2]. By pairing structured project data with **Google Gemini AI** and **n8n automation**, the platform[cite: 1, 2]:
-* Detects missing or inconsistent project details automatically[cite: 1, 2].
-* Generates tailored proposals, executive summaries, and contracts[cite: 1, 2].
-* Syncs smoothly with existing Google Sheets spreadsheets[cite: 1, 2].
-* Reduces manual document preparation time and streamlines operations.
-
----
-
-## ✨ Key Features
-
-### 🏢 1. Agency & Project Management
-* **Client & Project Hub**: Full CRUD operations for clients, active campaigns, budgets, and timelines[cite: 1, 2].
-* **Team & Role-Based Access (RBAC)**: Manage Project Managers, Designers, Copywriters, and Marketing Specialists with JWT authentication and secure roles[cite: 1, 2].
-* **Task & Calendar Views**: Organize deliverables using interactive Kanban boards, interactive calendars, and timeline views[cite: 1].
-
-### 🤖 2. Intelligent AI Assistant (Gemini API)
-* **Completeness Auditing**: Scans projects to detect missing budgets, end dates, or target audience details[cite: 1, 2].
-* **Content Generation**: Generates executive summaries, campaign objectives, risk assessments, and strategic recommendations[cite: 1, 2].
-* **AI Chat Assistant**: Embedded side-panel enabling agency teams to query project parameters and request instant document drafts[cite: 1].
-
-### 📄 3. Automated Document Generator
-* Automatically populates project parameters into customizable templates[cite: 1, 2].
-* Export business assets to multiple formats: **PDF**, **DOCX**, and **PPTX**[cite: 1, 2].
-* Instant document previews and PostgreSQL metadata tracking[cite: 1].
-
-### 🔄 4. Google Sheets & n8n Workflow Automation
-* **Google Sheets Sync**: Two-way data synchronization to import rows, update campaign metrics, and prevent duplicate records[cite: 1].
-* **n8n Webhook Orchestration**: Automated end-to-end pipelines triggered upon project creation (Project Created ➔ AI Analysis ➔ Proposal Generation ➔ Contract Drafting ➔ Email Notification)[cite: 1, 2].
-
----
-
-## 🛠️ Tech Stack
-
-| Category | Technologies |
-| :--- | :--- |
-| **Programming Languages** | TypeScript, JavaScript, SQL |
-| **Frontend Framework** | React, TypeScript, Tailwind CSS, shadcn/ui[cite: 1, 2] |
-| **Backend & API** | Node.js, Express.js, RESTful Architecture[cite: 1, 2] |
-| **Database** | PostgreSQL[cite: 1, 2] |
-| **AI Integration** | Google Gemini API[cite: 1, 2] |
-| **Workflow Automation** | n8n, Webhook Endpoints[cite: 1, 2] |
-| **Integrations** | Google Sheets API[cite: 1, 2] |
-| **Document Export** | PDF, DOCX, PPTX generation libraries[cite: 1, 2] |
-| **Auth & Security** | JWT Authentication, Role-Based Access Control (RBAC)[cite: 1, 2] |
-| **Dev Environment** | Replit, Git, GitHub |
-
----
-
-## 🏗️ Project Architecture & Roadmap
+## Repository Layout
 
 ```text
-                  ┌──────────────────────────────┐
-                  │    React + Tailwind UI       │
-                  └──────────────┬───────────────┘
-                                 │ REST API
-                                 ▼
-                  ┌──────────────────────────────┐
-                  │    Node.js / Express Server  │
-                  └──────┬───────┬───────┬───────┘
-                         │       │       │
-       ┌─────────────────┘       │       └─────────────────┐
-       ▼                         ▼                         ▼
-┌──────────────┐        ┌────────────────┐        ┌────────────────┐
-│  PostgreSQL  │        │ Google Gemini  │        │  n8n Webhook   │
-│   Database   │        │   AI Service   │        │ Engine / Sync  │
-└──────────────┘        └────────────────┘        └────────────────┘
+.
+├── artifacts/
+│   ├── agency-flow/            # Vite React application
+│   └── api-server/             # Express TypeScript API
+├── lib/
+│   ├── api-client-react/       # Generated React API client
+│   ├── api-zod/                # Zod validation primitives and generated docs
+│   └── db/                     # Drizzle schema and database access layer
+├── db/                          # Database migrations/seeding package
+└── package.json                 # Monorepo scripts and workspace package metadata
 ```
 
-### Development Phases (MVP Roadmap)
-- [x] **Phase 1: Project Foundation** — JWT Auth, PostgreSQL integration, Core CRUD for Clients & Projects[cite: 1].
-- [x] **Phase 2: Agency Management** — Kanban boards, Team assignments, Task tracking, and Activity logs[cite: 1].
-- [x] **Phase 3: AI Assistant** — Gemini API service integration, data audit engines, and AI chat panel[cite: 1].
-- [x] **Phase 4: Document Engine** — PDF/DOCX/PPTX export pipelines and file management[cite: 1].
-- [x] **Phase 5: Google Sheets Sync** — Automated sheet importing, duplicate handling, and dashboard sync[cite: 1].
-- [x] **Phase 6: n8n Workflow Automation** — Secure webhook pipelines and background automation logging[cite: 1].
-- [x] **Phase 7: Analytics Dashboard** — Visual metric charts for project velocity, completion rates, and budgets[cite: 1].
-- [ ] **Phase 8: Production Polish & Multi-Agent Expansion** *(Planned Future Work)*[cite: 1, 2]
+## Architecture
 
+The top-level architecture looks like this:
 
-### Development Phases (MVP Roadmap)
-- [x] **Phase 1: Project Foundation** — JWT Auth, PostgreSQL integration, Core CRUD for Clients & Projects[cite: 1].
-- [x] **Phase 2: Agency Management** — Kanban boards, Team assignments, Task tracking, and Activity logs[cite: 1].
-- [x] **Phase 3: AI Assistant** — Gemini API service integration, data audit engines, and AI chat panel[cite: 1].
-- [x] **Phase 4: Document Engine** — PDF/DOCX/PPTX export pipelines and file management[cite: 1].
-- [x] **Phase 5: Google Sheets Sync** — Automated sheet importing, duplicate handling, and dashboard sync[cite: 1].
-- [x] **Phase 6: n8n Workflow Automation** — Secure webhook pipelines and background automation logging[cite: 1].
-- [x] **Phase 7: Analytics Dashboard** — Visual metric charts for project velocity, completion rates, and budgets[cite: 1].
-- [ ] **Phase 8: Production Polish & Multi-Agent Expansion** *(Planned Future Work)*[cite: 1, 2]
+```text
+Browser UI (React + Vite)
+        │
+        ▼
+REST API (Express + TypeScript)
+        │
+        ├── Auth + JWT middleware
+        ├── CRUD routes for clients, projects, tasks, documents, sheets, analytics
+        ├── AI routes for generation and chat
+        └── Webhook routes for automation
+        │
+        ▼
+PostgreSQL via Drizzle ORM
+```
 
----
+## Workspace Packages
 
-## 🚀 Getting Started
+### Frontend: artifacts/agency-flow
 
-### Prerequisites
-* Node.js (v18 or higher)
-* PostgreSQL database instance
-* Google Gemini API Key
+The user-facing application is a Vite React single-page app built with TypeScript, Tailwind, and shadcn/ui inspired components. It communicates with the API through the generated API client package.
 
-### Installation & Setup
+Primary UI areas are:
 
-1. **Clone the Repository**
-   ```bash
-   git clone [https://github.com/Zainab476/AgencyFlow-AI-Intelligent-Workflow-Automation-Platform-for-Creative-Agencies.git](https://github.com/Zainab476/AgencyFlow-AI-Intelligent-Workflow-Automation-Platform-for-Creative-Agencies.git)
-   cd AgencyFlow-AI-Intelligent-Workflow-Automation-Platform-for-Creative-Agencies
+- Dashboard and analytics screens.
+- Client and project operations.
+- Profile and settings management.
+- Uploads, documents, sheets, and workflows.
+
+### Backend: artifacts/api-server
+
+The backend is an Express 5 server with route modules under `src/routes`. Authentication uses JWT signed with a shared secret and role-aware middleware. Business logic uses the shared Drizzle schema library.
+
+### Database: lib/db
+
+The database package exports the shared Drizzle schema. It includes PostgreSQL tables for users, clients, projects, tasks, documents, notifications, sheets, and webhook automation.
+
+### Generated API Layer: lib/api-client-react
+
+The generated React hooks and fetch wrappers in `lib/api-client-react/src/generated` are used by the web UI to call the REST API.
+
+## Role-Based Access Control
+
+AgencyFlow ships with a role model for three workspace roles:
+
+- `admin`
+- `manager`
+- `employee`
+
+The backend password and JWT middleware expose a reusable middleware factory:
+
+```ts
+requireAuth
+requireRole(["admin", "manager"])
+requireAdmin
+requireManager
+requireEmployee
+```
+
+Where:
+
+- `requireAuth` verifies the bearer JWT token.
+- `requireRole` allows a route or router to accept an explicit list of whitelisted roles.
+- `requireAdmin` restricts access to administrative users.
+- `requireManager` allows admins and managers.
+- `requireEmployee` allows admins, managers, and employees.
+
+Role data is now included in the JWT payload and in the `GET /api/auth/me` response.
+
+## Environment Variables
+
+The server and database packages read environment variables from the process environment.
+
+Required variables:
+
+```env
+PORT=3001
+DATABASE_URL=postgres://username:password@host:5432/agencyflow
+JWT_SECRET=replace-with-a-secure-random-secret
+```
+
+Optional or feature-specific variables:
+
+```env
+GOOGLE_API_KEY=your-gemini-key
+GOOGLE_GENAI_API_KEY=your-gemini-key
+RESEND_API_KEY=your-resend-key
+WEBHOOK_SECRET=your-webhook-secret
+```
+
+The workspace uses `DATABASE_URL` for the Drizzle/PostgreSQL connection pool exported by `lib/db/src/index.ts`. The API process also reads `PORT` from the process environment and must be available before the server starts.
+
+## Local Development Commands
+
+From the repository root:
+
+```bash
+pnpm install
+pnpm --filter @workspace/api-server dev
+pnpm --filter @workspace/agency-flow dev
+```
+
+Or use workspace scripts from the root:
+
+```bash
+pnpm run typecheck
+pnpm run build
+```
+
+## API Documentation
+
+The repository includes an OpenAPI specification in:
+
+```text
+lib/api-spec/openapi.yaml
+```
+
+It is used as the source of generated TypeScript types and client hooks. The API surface includes the following route families:
+
+### Authentication
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+
+### Clients
+
+- `GET /api/clients`
+- `POST /api/clients`
+- `GET /api/clients/:id`
+- `PUT /api/clients/:id`
+- `DELETE /api/clients/:id`
+
+### Projects
+
+- `GET /api/projects`
+- `POST /api/projects`
+- `GET /api/projects/:id`
+- `PUT /api/projects/:id`
+- `DELETE /api/projects/:id`
+
+### Tasks
+
+- `GET /api/tasks`
+- `POST /api/tasks`
+- `PUT /api/tasks/:id`
+- `DELETE /api/tasks/:id`
+
+### Documents
+
+- `GET /api/documents`
+- `POST /api/documents`
+- `GET /api/documents/:id`
+- `DELETE /api/documents/:id`
+
+### Analytics and dashboard
+
+- `GET /api/dashboard`
+- `GET /api/analytics`
+
+### Notifications and activity
+
+- `GET /api/notifications`
+- `GET /api/activity`
+
+### Webhooks and automation
+
+- `POST /api/webhooks/*`
+- `GET /api/webhooks/*`
+- `POST /api/sheets/*`
+
+## Settings and User Experience
+
+The UI now includes a dedicated Settings page in the React workspace that supports:
+
+- Light and dark mode switching.
+- Profile editing fields for name and email.
+- Email preference toggles for project updates, weekly digests, documents, and workflow alerts.
+- Role-aware profile and security display in the account panel.
+
+## Security Notes
+
+- All private routes and business routes are expected to use `requireAuth` or a role-aware middleware factory.
+- JWTs should be signed with a strong environment-provided secret in production.
+- The API uses `cors()` and bearer-token auth in the current Express setup.
+- Production deployments should enforce TLS, secrets management, stricter CORS, and database-level access policies.
+
+## Roadmap
+
+Phase 8 completes, in the repository, the Production Polish layer by adding:
+
+- RBAC middleware with `admin`, `manager`, and `employee` role enforcement.
+- A complete settings screen with UI-driven profile and preference management.
+- End-user-focused documentation for installation, architecture, runtime config, and API endpoints.

@@ -3,9 +3,12 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET ?? "agencyflow-dev-secret-change-in-prod";
 
+export type UserRole = "admin" | "manager" | "employee";
+
 export interface JwtPayload {
   userId: number;
   email: string;
+  role: UserRole;
 }
 
 declare global {
@@ -32,6 +35,28 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
     res.status(401).json({ error: "Invalid or expired token" });
   }
 }
+
+export function requireRole(allowedRoles: UserRole | UserRole[]) {
+  const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
+
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    if (!roles.includes(req.user.role)) {
+      res.status(403).json({ error: "Forbidden: insufficient role permissions" });
+      return;
+    }
+
+    next();
+  };
+}
+
+export const requireAdmin = requireRole("admin");
+export const requireManager = requireRole(["admin", "manager"]);
+export const requireEmployee = requireRole(["admin", "manager", "employee"]);
 
 export function signToken(payload: JwtPayload): string {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "7d" });

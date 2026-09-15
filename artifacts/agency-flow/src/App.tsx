@@ -21,6 +21,7 @@ import Documents from '@/pages/Documents';
 import Sheets from '@/pages/Sheets';
 import Workflows from '@/pages/Workflows';
 import Analytics from '@/pages/Analytics';
+import Settings from '@/pages/Settings';
 import NotFound from '@/pages/not-found';
 
 const queryClient = new QueryClient({
@@ -77,6 +78,9 @@ function Router() {
       </Route>
       <Route path="/profile">
         {() => <ProtectedRoute component={Profile} path="/profile" />}
+      </Route>
+      <Route path="/settings">
+        {() => <ProtectedRoute component={Settings} path="/settings" />}
       </Route>
       <Route path="/tasks">
         {() => <ProtectedRoute component={Tasks} path="/tasks" />}

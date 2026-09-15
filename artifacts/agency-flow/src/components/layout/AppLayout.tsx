@@ -15,6 +15,7 @@ import {
   Table2,
   Webhook,
   BarChart3,
+  Settings,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/useAuth';
 import { useGetMe, useListNotifications } from '@workspace/api-client-react';
@@ -111,6 +112,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
               <span className="text-sm font-medium text-sidebar-foreground">{user?.name || 'Loading...'}</span>
               <span className="text-xs text-sidebar-foreground/60">{user?.email || ''}</span>
             </div>
+          </div>
+        </Link>
+        <Link href="/settings">
+          <div className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-sidebar-accent/50 transition-colors cursor-pointer mb-2">
+            <Settings className="h-4 w-4" />
+            <span className="text-sm text-sidebar-foreground/80">Settings</span>
           </div>
         </Link>
         <Button 
